@@ -5,11 +5,12 @@ import gui.forms.MyContainerForm;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.Buffer;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class MyJFrame extends JFrame {
     private MyContainerForm myContainer;
 
-    private BufferedImage image;
+    private BufferedImage showedImage;
     private List<BufferedImage> images;
 
     public MyJFrame (){
@@ -37,6 +38,15 @@ public class MyJFrame extends JFrame {
     private void initFields() {
         myContainer = new MyContainerForm();
         images = new ArrayList<>();
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("C:/Users/Richard/Desktop/emptyImage.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        myContainer.getJLabelPreviousImage().setIcon(new ImageIcon(img));
+        myContainer.getJLabelImage().setIcon(new ImageIcon(img));
+        myContainer.getJLabelNextImage().setIcon(new ImageIcon(img));
     }
 
     public void closeJFrame(){
@@ -56,8 +66,8 @@ public class MyJFrame extends JFrame {
     }
 
     private void showImage(BufferedImage bufferedImage){
-        image = bufferedImage;
-        myContainer.getJLabelImage().setIcon(new ImageIcon(image));
+        showedImage = bufferedImage;
+        myContainer.getJLabelImage().setIcon(new ImageIcon(showedImage));
     }
 
 
