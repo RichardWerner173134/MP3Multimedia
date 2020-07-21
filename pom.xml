@@ -15,6 +15,13 @@
             <artifactId>jid3lib</artifactId>
             <version>0.5.4</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -25,7 +32,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>♦
+            </plugin>
         </plugins>
     </build>
 
