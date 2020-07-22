@@ -1,5 +1,6 @@
 package gui.behaviour;
 
+import gui.component.MP3SoundRecorder;
 import gui.frame.MyJFrame;
 import util.Util;
 
