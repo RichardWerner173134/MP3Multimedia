@@ -1,16 +1,15 @@
 package gui.frame;
 
+import gui.behaviour.ImageClickAction;
 import gui.behaviour.MyMenuActionFile;
 import gui.forms.MyContainerForm;
 import lombok.Getter;
 import lombok.Setter;
+import util.Util;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 public class MyJFrame extends JFrame {
     private MyContainerForm myContainer;
 
-    private BufferedImage showedImage;
+    private BufferedImage currentImage;
     private List<BufferedImage> images;
 
     public MyJFrame (){
@@ -38,15 +37,17 @@ public class MyJFrame extends JFrame {
     private void initFields() {
         myContainer = new MyContainerForm();
         images = new ArrayList<>();
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(new File("C:/Users/Richard/Desktop/emptyImage.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        myContainer.getJLabelPreviousImage().setIcon(new ImageIcon(img));
-        myContainer.getJLabelImage().setIcon(new ImageIcon(img));
-        myContainer.getJLabelNextImage().setIcon(new ImageIcon(img));
+
+        myContainer.getJLabelImage().setSize(250,250);
+        BufferedImage img = getEmptyImage();
+
+        setImageLabel(myContainer.getJLabelPreviousImage(), img);
+        setImageLabel(myContainer.getJLabelImage(), img);
+        setImageLabel(myContainer.getJLabelNextImage(), img);
+    }
+
+    private BufferedImage getEmptyImage() {
+        return Util.loadImgFromResources("emptyImage.png");
     }
 
     public void closeJFrame(){
@@ -54,21 +55,78 @@ public class MyJFrame extends JFrame {
     }
 
     private void addActionListeners(){
-        myContainer.getJMenuItemOpen().addActionListener(new MyMenuActionFile(this));
-        myContainer.getJMenuItemExit().addActionListener(new MyMenuActionFile(this));
-        myContainer.getJMenuItemSave().addActionListener(new MyMenuActionFile(this));
-        myContainer.getJMenuItemClose().addActionListener(new MyMenuActionFile(this));
+        MyMenuActionFile myMenuActionFile = new MyMenuActionFile(this);
+        myContainer.getJMenuItemOpen().addActionListener(myMenuActionFile);
+        myContainer.getJMenuItemExit().addActionListener(myMenuActionFile);
+        myContainer.getJMenuItemSave().addActionListener(myMenuActionFile);
+        myContainer.getJMenuItemClose().addActionListener(myMenuActionFile);
+
+        ImageClickAction imageClickAction = new ImageClickAction(this);
+        myContainer.getJLabelPreviousImage().addMouseListener(imageClickAction);
+        myContainer.getJLabelImage().addMouseListener(imageClickAction);
+        myContainer.getJLabelNextImage().addMouseListener(imageClickAction);
+
     }
 
-    public void addImage(BufferedImage bufferedImage){
-        images.add(bufferedImage);
-        showImage(bufferedImage);
+    //adding new Image to images
+    public void addImage(BufferedImage newImage){
+        images.add(newImage);
+        myContainer.getJLabelImageCount().setText("Anzahl Slides: " + images.size());
+
+        // adding first image
+        if(currentImage == null){
+            currentImage = newImage;
+        }
+        // adding more images
+        else {
+            setNextToCurrentImage();
+        }
+        updateImages();
     }
 
-    private void showImage(BufferedImage bufferedImage){
-        showedImage = bufferedImage;
-        myContainer.getJLabelImage().setIcon(new ImageIcon(showedImage));
+    public void setNextToCurrentImage(){
+        if(images.indexOf(currentImage) < images.size() - 1){
+            currentImage = images.get(images.indexOf(currentImage) + 1);
+        }
+    }
+
+    public void setPreviousToCurrentImage(){
+        if(images.indexOf(currentImage) > 0) {
+            currentImage = images.get(images.indexOf(currentImage) - 1);
+        }
+    }
+    private void setImageLabel(JLabel label, BufferedImage bufferedImage){
+        label.setIcon(new ImageIcon(bufferedImage.getScaledInstance(
+                myContainer.getJLabelImage().getWidth(),
+                myContainer.getJLabelImage().getHeight(),
+                0)));
     }
 
 
+    public void updateImages(){
+        // no images: 3 times emptyImage
+        if(currentImage == null){
+            setImageLabel(myContainer.getJLabelPreviousImage(), getEmptyImage());
+            setImageLabel(myContainer.getJLabelImage(), getEmptyImage());
+            setImageLabel(myContainer.getJLabelNextImage(), getEmptyImage());
+        }
+        // at least 1 image: show currentImage
+        else{
+            setImageLabel(myContainer.getJLabelImage(), currentImage);
+
+            if(images.indexOf(currentImage) == images.size() - 1){
+                setImageLabel(myContainer.getJLabelNextImage(), getEmptyImage());
+            }
+            else{
+                setImageLabel(myContainer.getJLabelNextImage(), images.get(images.indexOf(currentImage) + 1));
+            }
+            if(images.indexOf(currentImage) > 0){
+                setImageLabel(myContainer.getJLabelPreviousImage(), images.get(images.indexOf(currentImage) - 1));
+            }
+            else{
+                setImageLabel(myContainer.getJLabelPreviousImage(), getEmptyImage());
+            }
+
+        }
+    }
 }

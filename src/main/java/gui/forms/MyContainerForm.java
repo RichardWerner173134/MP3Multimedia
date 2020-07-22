@@ -27,4 +27,5 @@ public class MyContainerForm extends Container {
     private JLabel jLabelPreviousImage;
     private JLabel jLabelNextImage;
     private JPanel jPanelPicturePreview;
+    private JLabel jLabelImageCount;
 }
