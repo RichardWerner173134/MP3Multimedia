@@ -24,4 +24,8 @@ public class MyContainerForm extends Container {
     private JMenuItem jMenuItemExit;
     private JMenuItem jMenuItemSettings;
     private JLabel jLabelImage;
+    private JLabel jLabelPreviousImage;
+    private JLabel jLabelNextImage;
+    private JPanel jPanelPicturePreview;
+    private JLabel jLabelImageCount;
 }

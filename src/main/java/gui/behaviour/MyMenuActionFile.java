@@ -1,13 +1,12 @@
 package gui.behaviour;
 
 import gui.frame.MyJFrame;
+import util.Util;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 
 public class MyMenuActionFile extends AbstractAction {
@@ -29,13 +28,7 @@ public class MyMenuActionFile extends AbstractAction {
                     File file = jFileChooser.getSelectedFile();
                     //This is where a real application would open the file.
                     System.out.println("Opening: " + file.getName());
-
-                    BufferedImage img = null;
-                    try {
-                        img = ImageIO.read(file);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    BufferedImage img = Util.loadImg(file.getPath());
 
                     myJFrame.addImage(img);
                 } else {
