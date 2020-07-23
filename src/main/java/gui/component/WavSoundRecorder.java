@@ -2,6 +2,7 @@ package gui.component;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.util.List;
 
 /**
  * A sample program is to demonstrate how to record sound in Java
@@ -94,5 +95,35 @@ public class WavSoundRecorder {
 
     public void setWavFile(File wavFile) {
         this.wavFile = wavFile;
+    }
+
+    public static void concatenateAllWAVFiles(List<File> files){
+        AudioInputStream finalInputStream = null;
+
+        for(File file : files){
+            try {
+                finalInputStream = joinWavFiles(finalInputStream, AudioSystem.getAudioInputStream((file)));
+            } catch (UnsupportedAudioFileException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            AudioSystem.write(finalInputStream,
+                    AudioFileFormat.Type.WAVE,
+                    new File("D:\\wavAppended.wav"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static AudioInputStream joinWavFiles(AudioInputStream stream1, AudioInputStream stream2){
+        return new AudioInputStream(
+                new SequenceInputStream(stream1, stream2),
+                        stream1.getFormat(),
+                        stream1.getFrameLength() + stream2.getFrameLength());
     }
 }

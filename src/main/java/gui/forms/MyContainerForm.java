@@ -7,9 +7,7 @@ import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Setter
 @Getter

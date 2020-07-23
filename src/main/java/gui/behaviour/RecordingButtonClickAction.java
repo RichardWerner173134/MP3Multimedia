@@ -18,9 +18,6 @@ public class RecordingButtonClickAction extends AbstractAction {
     private String filename = "./target/sound/RecordAudio";
     private String fileFormat = ".wav";
 
-    final String source = "./target/sound/RecordAudio.wav";
-    final String target = "./target/sound/RecordAudio.mp3";
-
     private List<File> files;
 
     public RecordingButtonClickAction(MyJFrame myJFrame){
@@ -71,6 +68,7 @@ public class RecordingButtonClickAction extends AbstractAction {
 
             finisherThread.start();
             //TODO wavs zusammenfügen
+
         }
     }
 }
