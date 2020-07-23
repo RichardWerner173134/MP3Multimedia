@@ -39,6 +39,8 @@ public class MyMenuActionFile extends AbstractAction {
                 break;
             case "Save":
                 //Save Opened File
+                MP3SoundRecorder mp3SoundRecorder = new MP3SoundRecorder("./target/sound/final.wav", "./target/sound/final.mp3");
+                mp3SoundRecorder.convertWavToMp3();
                 break;
             case "Close":
                 //Close Opened File

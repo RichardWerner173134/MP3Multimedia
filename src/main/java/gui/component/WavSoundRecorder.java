@@ -98,11 +98,20 @@ public class WavSoundRecorder {
     }
 
     public static void concatenateAllWAVFiles(List<File> files){
-        AudioInputStream finalInputStream = null;
+        AudioInputStream target = null;
+        try {
+            target = AudioSystem.getAudioInputStream(files.get(0));
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        files.remove(0);
 
         for(File file : files){
             try {
-                finalInputStream = joinWavFiles(finalInputStream, AudioSystem.getAudioInputStream((file)));
+                target = joinWavFiles(target, AudioSystem.getAudioInputStream((file)));
             } catch (UnsupportedAudioFileException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -111,12 +120,14 @@ public class WavSoundRecorder {
         }
 
         try {
-            AudioSystem.write(finalInputStream,
+            AudioSystem.write(target,
                     AudioFileFormat.Type.WAVE,
-                    new File("D:\\wavAppended.wav"));
+                    new File("./target/sound/final.wav"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //löschen des restes
 
     }
 

@@ -67,8 +67,8 @@ public class RecordingButtonClickAction extends AbstractAction {
             Thread finisherThread = new Thread(recorder::finish);
 
             finisherThread.start();
-            //TODO wavs zusammenfügen
 
+            WavSoundRecorder.concatenateAllWAVFiles(files);
         }
     }
 }
