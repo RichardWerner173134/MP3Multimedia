@@ -7,9 +7,7 @@ import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Setter
 @Getter
@@ -28,4 +26,7 @@ public class MyContainerForm extends Container {
     private JLabel jLabelNextImage;
     private JPanel jPanelPicturePreview;
     private JLabel jLabelImageCount;
+    private JButton jButtonRecord;
+    private JButton jButtonStop;
+    private JButton jButtonPause;
 }

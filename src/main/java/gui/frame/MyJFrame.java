@@ -2,6 +2,7 @@ package gui.frame;
 
 import gui.behaviour.ImageClickAction;
 import gui.behaviour.MyMenuActionFile;
+import gui.behaviour.RecordingButtonClickAction;
 import gui.forms.MyContainerForm;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,6 +67,11 @@ public class MyJFrame extends JFrame {
         myContainer.getJLabelImage().addMouseListener(imageClickAction);
         myContainer.getJLabelNextImage().addMouseListener(imageClickAction);
 
+        RecordingButtonClickAction recordingButtonClickAction = new RecordingButtonClickAction(this);
+        myContainer.getJButtonRecord().addActionListener(recordingButtonClickAction);
+        myContainer.getJButtonPause().addActionListener(recordingButtonClickAction);
+        myContainer.getJButtonStop().addActionListener(recordingButtonClickAction);
+
     }
 
     //adding new Image to images
@@ -95,13 +101,13 @@ public class MyJFrame extends JFrame {
             currentImage = images.get(images.indexOf(currentImage) - 1);
         }
     }
+
     private void setImageLabel(JLabel label, BufferedImage bufferedImage){
         label.setIcon(new ImageIcon(bufferedImage.getScaledInstance(
                 myContainer.getJLabelImage().getWidth(),
                 myContainer.getJLabelImage().getHeight(),
                 0)));
     }
-
 
     public void updateImages(){
         // no images: 3 times emptyImage
