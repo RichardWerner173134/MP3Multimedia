@@ -56,11 +56,11 @@ public class WavSoundRecorder {
             line.open(format);
             line.start();   // start capturing
 
-            System.out.println("Start capturing...");
+            System.out.println("capturing...");
 
             AudioInputStream ais = new AudioInputStream(line);
 
-            System.out.println("Start recording...");
+            System.out.println("recording...");
 
             // start recording
             AudioSystem.write(ais, fileType, wavFile);
@@ -73,7 +73,8 @@ public class WavSoundRecorder {
     }
 
     public void pause(){
-        finish();
+        line.stop();
+        line.close();
         System.out.println("Recording paused");
     }
 
@@ -99,15 +100,6 @@ public class WavSoundRecorder {
 
     public static void concatenateAllWAVFiles(List<File> files){
         AudioInputStream target = null;
-        try {
-            target = AudioSystem.getAudioInputStream(files.get(0));
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        files.remove(0);
 
         for(File file : files){
             try {
@@ -118,6 +110,7 @@ public class WavSoundRecorder {
                 e.printStackTrace();
             }
         }
+        files = null;
 
         try {
             AudioSystem.write(target,
@@ -126,12 +119,12 @@ public class WavSoundRecorder {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //löschen des restes
-
     }
 
     public static AudioInputStream joinWavFiles(AudioInputStream stream1, AudioInputStream stream2){
+        if(stream1 == null){
+            return stream2;
+        }
         return new AudioInputStream(
                 new SequenceInputStream(stream1, stream2),
                         stream1.getFormat(),

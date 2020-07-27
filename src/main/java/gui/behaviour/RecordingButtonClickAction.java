@@ -7,15 +7,19 @@ import gui.frame.MyJFrame;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecordingButtonClickAction extends AbstractAction {
     private MyJFrame myJFrame;
 
-    final WavSoundRecorder recorder = new WavSoundRecorder();
-    private String filename = "./target/sound/RecordAudio";
+    WavSoundRecorder recorder = new WavSoundRecorder();
+    private String filename = "target/sound/RecordAudio";
     private String fileFormat = ".wav";
 
     private List<File> files;
@@ -28,6 +32,7 @@ public class RecordingButtonClickAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton jButton = ((JButton)e.getSource());
+        toggleButtons(jButton);
 
         //startRecording
         if (jButton == myJFrame.getMyContainer().getJButtonRecord()){
@@ -65,10 +70,51 @@ public class RecordingButtonClickAction extends AbstractAction {
         if (jButton == myJFrame.getMyContainer().getJButtonStop()){
             //stopRecording
             Thread finisherThread = new Thread(recorder::finish);
-
             finisherThread.start();
 
             WavSoundRecorder.concatenateAllWAVFiles(files);
+
+            List<Path> filePaths = files.stream()
+                    .map(file -> Paths.get(file.getAbsolutePath()))
+                    .collect(Collectors.toList());
+
+            recorder = null;
+            files = null;
+
+            deleteFiles(filePaths);
+        }
+    }
+
+    private void deleteFiles(List<Path> filePaths){
+        for(Path p : filePaths){
+            try {
+                Files.delete(p);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void toggleButtons(JButton buttonPressed){
+        if(buttonPressed == myJFrame.getMyContainer().getJButtonRecord()){
+            myJFrame.getMyContainer().getJButtonRecord().setEnabled(false);
+            myJFrame.getMyContainer().getJButtonPause().setEnabled(true);
+            myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
+        }
+        if(buttonPressed == myJFrame.getMyContainer().getJButtonPause()){
+            myJFrame.getMyContainer().getJButtonRecord().setEnabled(false);
+            myJFrame.getMyContainer().getJButtonPause().setEnabled(true);
+            if(buttonPressed.getText().equals("Pause")){
+                myJFrame.getMyContainer().getJButtonStop().setEnabled(true);
+            }
+            else{
+                myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
+            }
+        }
+        if(buttonPressed == myJFrame.getMyContainer().getJButtonStop()){
+            myJFrame.getMyContainer().getJButtonRecord().setEnabled(true);
+            myJFrame.getMyContainer().getJButtonPause().setEnabled(false);
+            myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
         }
     }
 }

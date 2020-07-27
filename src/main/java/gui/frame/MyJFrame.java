@@ -45,6 +45,10 @@ public class MyJFrame extends JFrame {
         setImageLabel(myContainer.getJLabelPreviousImage(), img);
         setImageLabel(myContainer.getJLabelImage(), img);
         setImageLabel(myContainer.getJLabelNextImage(), img);
+
+        myContainer.getJButtonRecord().setEnabled(true);
+        myContainer.getJButtonPause().setEnabled(false);
+        myContainer.getJButtonStop().setEnabled(false);
     }
 
     private BufferedImage getEmptyImage() {
