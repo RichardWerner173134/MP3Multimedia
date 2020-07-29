@@ -36,6 +36,5 @@ public class MP3SoundRecorder {
             System.out.println("converting failed");
             e.printStackTrace();
         }
-
     }
 }

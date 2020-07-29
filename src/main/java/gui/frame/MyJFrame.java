@@ -45,6 +45,10 @@ public class MyJFrame extends JFrame {
         setImageLabel(myContainer.getJLabelPreviousImage(), img);
         setImageLabel(myContainer.getJLabelImage(), img);
         setImageLabel(myContainer.getJLabelNextImage(), img);
+
+        myContainer.getJButtonRecord().setEnabled(true);
+        myContainer.getJButtonPause().setEnabled(false);
+        myContainer.getJButtonStop().setEnabled(false);
     }
 
     private BufferedImage getEmptyImage() {
@@ -133,6 +137,29 @@ public class MyJFrame extends JFrame {
                 setImageLabel(myContainer.getJLabelPreviousImage(), getEmptyImage());
             }
 
+        }
+    }
+
+    public void toggleButtons(JButton buttonPressed){
+        if(buttonPressed == myContainer.getJButtonRecord()){
+            myContainer.getJButtonRecord().setEnabled(false);
+            myContainer.getJButtonPause().setEnabled(true);
+            myContainer.getJButtonStop().setEnabled(false);
+        }
+        if(buttonPressed == myContainer.getJButtonPause()){
+            myContainer.getJButtonRecord().setEnabled(false);
+            myContainer.getJButtonPause().setEnabled(true);
+            if(buttonPressed.getText().equals("Pause")){
+                myContainer.getJButtonStop().setEnabled(true);
+            }
+            else{
+                myContainer.getJButtonStop().setEnabled(false);
+            }
+        }
+        if(buttonPressed == myContainer.getJButtonStop()){
+            myContainer.getJButtonRecord().setEnabled(true);
+            myContainer.getJButtonPause().setEnabled(false);
+            myContainer.getJButtonStop().setEnabled(false);
         }
     }
 }

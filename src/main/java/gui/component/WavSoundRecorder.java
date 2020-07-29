@@ -2,6 +2,7 @@ package gui.component;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -56,11 +57,11 @@ public class WavSoundRecorder {
             line.open(format);
             line.start();   // start capturing
 
-            System.out.println("Start capturing...");
+            System.out.println("capturing...");
 
             AudioInputStream ais = new AudioInputStream(line);
 
-            System.out.println("Start recording...");
+            System.out.println("recording...");
 
             // start recording
             AudioSystem.write(ais, fileType, wavFile);
@@ -73,7 +74,8 @@ public class WavSoundRecorder {
     }
 
     public void pause(){
-        finish();
+        line.stop();
+        line.close();
         System.out.println("Recording paused");
     }
 
@@ -89,25 +91,12 @@ public class WavSoundRecorder {
         System.out.println("Finished");
     }
 
-    public File getWavFile() {
-        return wavFile;
-    }
-
     public void setWavFile(File wavFile) {
         this.wavFile = wavFile;
     }
 
-    public static void concatenateAllWAVFiles(List<File> files){
+    public static AudioInputStream concatenateFiles(List<File> files){
         AudioInputStream target = null;
-        try {
-            target = AudioSystem.getAudioInputStream(files.get(0));
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        files.remove(0);
 
         for(File file : files){
             try {
@@ -120,18 +109,29 @@ public class WavSoundRecorder {
         }
 
         try {
-            AudioSystem.write(target,
+            target.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return target;
+    }
+
+    public void saveStreamToFile(AudioInputStream ais, Path path){
+        try {
+            AudioSystem.write(ais,
                     AudioFileFormat.Type.WAVE,
-                    new File("./target/sound/final.wav"));
+                    new File(path.toAbsolutePath().toString()));
+            System.out.println("File saved successfully at: " + path.toAbsolutePath().toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //löschen des restes
-
     }
 
     public static AudioInputStream joinWavFiles(AudioInputStream stream1, AudioInputStream stream2){
+        if(stream1 == null){
+            return stream2;
+        }
         return new AudioInputStream(
                 new SequenceInputStream(stream1, stream2),
                         stream1.getFormat(),
