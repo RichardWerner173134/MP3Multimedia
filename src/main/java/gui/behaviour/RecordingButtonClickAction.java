@@ -3,11 +3,13 @@ package gui.behaviour;
 import gui.component.MP3SoundRecorder;
 import gui.component.WavSoundRecorder;
 import gui.frame.MyJFrame;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -83,12 +85,18 @@ public class RecordingButtonClickAction extends AbstractAction {
             Thread finisherThread = new Thread(wavRecorder::finish);
             finisherThread.start();
 
+            //Inputstream für gejointe wavFile
             AudioInputStream ais = WavSoundRecorder.concatenateFiles(files);
+
+            //Speichern der WAV
             wavRecorder.saveStreamToFile(ais, Paths.get(filenameFinal + wavFormatSuffix));
+
+            //Löschen der splitFiles
             deleteWavSplitFiles();
 
             mp3SoundRecorder.convertWavToMp3();
 
+            //Löschen der vollständigen WAV
             deleteFile(new File(filenameFinal + wavFormatSuffix));
         }
     }
