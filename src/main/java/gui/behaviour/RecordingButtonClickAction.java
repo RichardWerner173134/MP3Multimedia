@@ -3,7 +3,6 @@ package gui.behaviour;
 import gui.component.MP3SoundRecorder;
 import gui.component.WavSoundRecorder;
 import gui.frame.MyJFrame;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +16,8 @@ import java.util.List;
 public class RecordingButtonClickAction extends AbstractAction {
     private MyJFrame myJFrame;
 
-    final private String wavSplitFileName = "target/sound/RecordAudio";
+    final private String directory = "target/sound";
+    final private String wavSplitFileName = "RecordAudio";
     final private String wavFormatSuffix = ".wav";
     final private String mp3FormatSuffix = ".mp3";
 
@@ -42,9 +42,14 @@ public class RecordingButtonClickAction extends AbstractAction {
 
         //startRecording
         if (jButton == myJFrame.getMyContainer().getJButtonRecord()){
-            File newWavFile = new File(wavSplitFileName + files.size() + wavFormatSuffix);
+            File newWavFile = new File(directory + "/" + wavSplitFileName + files.size() + wavFormatSuffix);
             files.add(newWavFile);
             wavRecorder.setWavFile(newWavFile);
+
+            File saveDirectory = new File(directory);
+            if(! saveDirectory.exists()){
+                saveDirectory.mkdir();
+            }
 
             Thread starterThread = new Thread(wavRecorder::start);
 
@@ -61,7 +66,7 @@ public class RecordingButtonClickAction extends AbstractAction {
             }
             //continueRec
             else{
-                File newWavFile = new File(wavSplitFileName + files.size() + wavFormatSuffix);
+                File newWavFile = new File(directory + "/" + wavSplitFileName + files.size() + wavFormatSuffix);
                 files.add(newWavFile);
                 wavRecorder.setWavFile(newWavFile);
 
@@ -84,7 +89,7 @@ public class RecordingButtonClickAction extends AbstractAction {
 
             mp3SoundRecorder.convertWavToMp3();
 
-            deleteFile(new File(filenameFinal + mp3FormatSuffix));
+            deleteFile(new File(filenameFinal + wavFormatSuffix));
         }
     }
 
