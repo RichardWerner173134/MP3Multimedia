@@ -2,6 +2,7 @@ package gui.component;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -90,15 +91,11 @@ public class WavSoundRecorder {
         System.out.println("Finished");
     }
 
-    public File getWavFile() {
-        return wavFile;
-    }
-
     public void setWavFile(File wavFile) {
         this.wavFile = wavFile;
     }
 
-    public static void concatenateAllWAVFiles(List<File> files){
+    public static AudioInputStream concatenateFiles(List<File> files){
         AudioInputStream target = null;
 
         for(File file : files){
@@ -110,15 +107,25 @@ public class WavSoundRecorder {
                 e.printStackTrace();
             }
         }
-        files = null;
 
         try {
-            AudioSystem.write(target,
-                    AudioFileFormat.Type.WAVE,
-                    new File("./target/sound/final.wav"));
+            target.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return target;
+    }
+
+    public void saveStreamToFile(AudioInputStream ais, Path path){
+        try {
+            AudioSystem.write(ais,
+                    AudioFileFormat.Type.WAVE,
+                    new File(path.toAbsolutePath().toString()));
+            System.out.println("File saved successfully at: " + path.toAbsolutePath().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static AudioInputStream joinWavFiles(AudioInputStream stream1, AudioInputStream stream2){

@@ -4,23 +4,29 @@ import gui.component.MP3SoundRecorder;
 import gui.component.WavSoundRecorder;
 import gui.frame.MyJFrame;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RecordingButtonClickAction extends AbstractAction {
     private MyJFrame myJFrame;
 
-    WavSoundRecorder recorder = new WavSoundRecorder();
-    private String filename = "target/sound/RecordAudio";
-    private String fileFormat = ".wav";
+    final private String wavSplitFileName = "target/sound/RecordAudio";
+    final private String wavFormatSuffix = ".wav";
+    final private String mp3FormatSuffix = ".mp3";
+
+    final private String filenameFinal = "target/sound/final";
+
+    private WavSoundRecorder wavRecorder = new WavSoundRecorder();
+    private MP3SoundRecorder mp3SoundRecorder = new MP3SoundRecorder(
+            filenameFinal + wavFormatSuffix,
+            filenameFinal + mp3FormatSuffix);
 
     private List<File> files;
 
@@ -32,15 +38,15 @@ public class RecordingButtonClickAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton jButton = ((JButton)e.getSource());
-        toggleButtons(jButton);
+        myJFrame.toggleButtons(jButton);
 
         //startRecording
         if (jButton == myJFrame.getMyContainer().getJButtonRecord()){
-            File newWavFile = new File(filename + files.size() + fileFormat);
+            File newWavFile = new File(wavSplitFileName + files.size() + wavFormatSuffix);
             files.add(newWavFile);
-            recorder.setWavFile(newWavFile);
+            wavRecorder.setWavFile(newWavFile);
 
-            Thread starterThread = new Thread(recorder::start);
+            Thread starterThread = new Thread(wavRecorder::start);
 
             starterThread.start();
         }
@@ -49,18 +55,18 @@ public class RecordingButtonClickAction extends AbstractAction {
             //pauseRecording
             if(jButton.getText().equals("Pause")){
                 jButton.setText("Continue");
-                Thread pauseThread = new Thread(recorder::pause);
+                Thread pauseThread = new Thread(wavRecorder::pause);
 
                 pauseThread.start();
             }
             //continueRec
             else{
-                File newWavFile = new File(filename + files.size() + fileFormat);
+                File newWavFile = new File(wavSplitFileName + files.size() + wavFormatSuffix);
                 files.add(newWavFile);
-                recorder.setWavFile(newWavFile);
+                wavRecorder.setWavFile(newWavFile);
 
                 jButton.setText("Pause");
-                Thread continueThread = new Thread(recorder::continueRec);
+                Thread continueThread = new Thread(wavRecorder::continueRec);
 
                 continueThread.start();
             }
@@ -69,52 +75,35 @@ public class RecordingButtonClickAction extends AbstractAction {
 
         if (jButton == myJFrame.getMyContainer().getJButtonStop()){
             //stopRecording
-            Thread finisherThread = new Thread(recorder::finish);
+            Thread finisherThread = new Thread(wavRecorder::finish);
             finisherThread.start();
 
-            WavSoundRecorder.concatenateAllWAVFiles(files);
+            AudioInputStream ais = WavSoundRecorder.concatenateFiles(files);
+            wavRecorder.saveStreamToFile(ais, Paths.get("target/sound/final.wav"));
+            deleteWavSplitFiles();
 
-            List<Path> filePaths = files.stream()
-                    .map(file -> Paths.get(file.getAbsolutePath()))
-                    .collect(Collectors.toList());
+            mp3SoundRecorder.convertWavToMp3();
 
-            recorder = null;
-            files = null;
-
-            deleteFiles(filePaths);
+            deleteFile(new File(filenameFinal + mp3FormatSuffix));
         }
     }
 
-    private void deleteFiles(List<Path> filePaths){
-        for(Path p : filePaths){
-            try {
-                Files.delete(p);
-            } catch (IOException e) {
-                e.printStackTrace();
+    private void deleteWavSplitFiles() {
+        File directory = new File("./target/sound");
+        wavRecorder.setWavFile(null);
+        files = null;
+        for (File f : directory.listFiles()) {
+            if (f.getName().startsWith("RecordAudio")) {
+                deleteFile(f);
             }
         }
     }
 
-    private void toggleButtons(JButton buttonPressed){
-        if(buttonPressed == myJFrame.getMyContainer().getJButtonRecord()){
-            myJFrame.getMyContainer().getJButtonRecord().setEnabled(false);
-            myJFrame.getMyContainer().getJButtonPause().setEnabled(true);
-            myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
-        }
-        if(buttonPressed == myJFrame.getMyContainer().getJButtonPause()){
-            myJFrame.getMyContainer().getJButtonRecord().setEnabled(false);
-            myJFrame.getMyContainer().getJButtonPause().setEnabled(true);
-            if(buttonPressed.getText().equals("Pause")){
-                myJFrame.getMyContainer().getJButtonStop().setEnabled(true);
-            }
-            else{
-                myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
-            }
-        }
-        if(buttonPressed == myJFrame.getMyContainer().getJButtonStop()){
-            myJFrame.getMyContainer().getJButtonRecord().setEnabled(true);
-            myJFrame.getMyContainer().getJButtonPause().setEnabled(false);
-            myJFrame.getMyContainer().getJButtonStop().setEnabled(false);
+    private void deleteFile(File f) {
+        try {
+            Files.delete(Paths.get(f.getCanonicalPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
