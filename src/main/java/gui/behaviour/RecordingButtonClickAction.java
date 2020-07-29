@@ -84,7 +84,7 @@ public class RecordingButtonClickAction extends AbstractAction {
             finisherThread.start();
 
             AudioInputStream ais = WavSoundRecorder.concatenateFiles(files);
-            wavRecorder.saveStreamToFile(ais, Paths.get("target/sound/final.wav"));
+            wavRecorder.saveStreamToFile(ais, Paths.get(filenameFinal + wavFormatSuffix));
             deleteWavSplitFiles();
 
             mp3SoundRecorder.convertWavToMp3();
