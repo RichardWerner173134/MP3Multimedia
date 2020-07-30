@@ -16,7 +16,6 @@
             <artifactId>jid3lib</artifactId>
             <version>0.5.4</version>
         </dependency>
-
         <!-- encoding library-->
         <dependency>
             <groupId>ws.schild</groupId>
