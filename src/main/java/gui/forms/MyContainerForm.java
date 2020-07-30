@@ -29,4 +29,5 @@ public class MyContainerForm extends Container {
     private JButton jButtonRecord;
     private JButton jButtonStop;
     private JButton jButtonPause;
+    private JPanel jPanelButtons;
 }
