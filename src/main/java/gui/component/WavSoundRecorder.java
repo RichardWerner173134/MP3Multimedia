@@ -2,8 +2,10 @@ package gui.component;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +20,7 @@ public class WavSoundRecorder {
     private File wavFile;
 
     // format of audio file
-    AudioFileFormat.Type fileType;
+    private static AudioFileFormat.Type fileType;
 
     // the line from which audio data is captured
     TargetDataLine line;
@@ -30,7 +32,7 @@ public class WavSoundRecorder {
     /**
      * Defines an audio format
      */
-    AudioFormat getAudioFormat() {
+    private static AudioFormat getAudioFormat() {
         float sampleRate = 16000;
         int sampleSizeInBits = 8;
         int channels = 2;
@@ -96,46 +98,49 @@ public class WavSoundRecorder {
         this.wavFile = wavFile;
     }
 
-    public static AudioInputStream concatenateFiles(List<File> files){
-        AudioInputStream target = null;
+    public void saveStreamToFile(AudioInputStream ais, Path path){
+        try {
+            AudioSystem.write(ais,
+                    AudioFileFormat.Type.WAVE,
+                    new File(path.toAbsolutePath().toString()));
+            ais.close();
+            System.out.println("File saved successfully at: " + path.toAbsolutePath().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static AudioInputStream concatenateFiles(List<File> files){
+
+        AudioInputStream target = null;
+        int i = 0;
         for(File file : files){
             try {
-                target = joinWavFiles(target, AudioSystem.getAudioInputStream((file)));
+                AudioInputStream stream = AudioSystem.getAudioInputStream(file);
+                if(target != null){
+
+                    SequenceInputStream seq = new SequenceInputStream(target, stream);
+
+                    target = new AudioInputStream(seq,
+                            getAudioFormat(),
+                            target.getFrameLength() + stream.getFrameLength());
+                }
+                else{
+                    target = new AudioInputStream(stream, getAudioFormat(), stream.getFrameLength());
+                }
+                i++;
             } catch (UnsupportedAudioFileException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        try {
+        /*try {
+            AudioSystem.write(target, fileType, new File("target/sound/final.wav"));
             target.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return target;
-    }
-
-    public void saveStreamToFile(AudioInputStream ais, Path path){
-        try {
-            AudioSystem.write(ais,
-                    AudioFileFormat.Type.WAVE,
-                    new File(path.toAbsolutePath().toString()));
-            System.out.println("File saved successfully at: " + path.toAbsolutePath().toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static AudioInputStream joinWavFiles(AudioInputStream stream1, AudioInputStream stream2){
-        if(stream1 == null){
-            return stream2;
-        }
-        return new AudioInputStream(
-                new SequenceInputStream(stream1, stream2),
-                        stream1.getFormat(),
-                        stream1.getFrameLength() + stream2.getFrameLength());
     }
 }

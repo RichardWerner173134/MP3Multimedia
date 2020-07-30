@@ -9,6 +9,7 @@ import lombok.Setter;
 import util.Util;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -31,8 +32,9 @@ public class MyJFrame extends JFrame {
         setContentPane(myContainer.getTopLayerJPanel());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize.width, screenSize.height);
         setVisible(true);
-
     }
 
     private void initFields() {
