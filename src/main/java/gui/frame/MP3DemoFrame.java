@@ -1,5 +1,6 @@
 package gui.frame;
 
+import model.ImageList;
 import model.MP3Enricher;
 import net.miginfocom.swing.MigLayout;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -8,28 +9,35 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
-import org.jaudiotagger.tag.id3.ID3v24Frame;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
-import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+
+import static javax.swing.ScrollPaneConstants.*;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class MP3DemoFrame extends JFrame {
     private JPanel topLevelPanel = new JPanel();
-    private JLabel mp3Info = new JLabel("no mp3 file loaded");
-    private JButton loadMp3 = new JButton("Load MP3");
+
+    private JLabel jLabelFrames = new JLabel("Keine MP3 geladen");
+    private JButton jButtonLoadMp3 = new JButton("Lade MP3");
     private MP3File mp3File;
 
+    private JButton jButtonAttachPicture = new JButton("Ausgewähltes Bild einbauen");
+    private JButton jButtonAddImage = new JButton("Add Image");
 
-    private JButton addImage = new JButton("Add Image");
+    private JLabel jLabelImageList = new JLabel("Geladene Bilder");
 
+    private JScrollPane jScrollPaneList;
+    private JList jList = new JList();
+
+    private JPanel jPanelWest = new JPanel();
+    private JPanel jPanelEast = new JPanel();
+    private JPanel jPanelSouth = new JPanel();
+
+    private ImageList imageList = new ImageList();
 
     public MP3DemoFrame(){
         setContentPane(topLevelPanel);
@@ -41,11 +49,11 @@ public class MP3DemoFrame extends JFrame {
         setVisible(true);
 
         initActionListeners();
-        setupPanel();
+        setupPanels();
     }
 
     private void initActionListeners() {
-        loadMp3.addActionListener(e -> {
+        jButtonLoadMp3.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int returnVal = fileChooser.showOpenDialog(topLevelPanel);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -54,95 +62,55 @@ public class MP3DemoFrame extends JFrame {
                 } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotReadException ex) {
                     ex.printStackTrace();
                 }
-                mp3Info.setText(MP3Enricher.getMP3Info(mp3File));
+                jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
 
             }
         });
 
-        addImage.addActionListener(e -> {
+        jButtonAddImage.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int returnVal = fileChooser.showOpenDialog(topLevelPanel);
             if(returnVal == JFileChooser.APPROVE_OPTION){
-                BufferedImage image = null;
-                try {
-                    image = ImageIO.read(fileChooser.getSelectedFile());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                createFrame(image);
-                try {
-                    mp3File.save();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } catch (TagException ex) {
-                    ex.printStackTrace();
-                }
-                mp3Info.setText(MP3Enricher.getMP3Info(mp3File));
+                imageList.addImage(fileChooser.getSelectedFile());
+                jList.setModel(imageList);
             }
+        });
+
+        jButtonAttachPicture.addActionListener(e -> {
+
+            //MP3Enricher.addPicure(mp3File, fileChooser.getSelectedFile(), 200);
+            jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
+
         });
     }
 
-    private void createFrame(BufferedImage image) {
-        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
 
-        if(tag.frameMap.containsKey("APIC")){
-            if(tag.frameMap.get("APIC") instanceof AbstractID3v2Frame){
-                AbstractID3v2Frame frameOld = (AbstractID3v2Frame) tag.frameMap.get("APIC");
-                tag.frameMap.remove("APIC");
-
-                ID3v24Frame newFrame = new ID3v24Frame("APIC");
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    ImageIO.write(image, "png", baos);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] data = baos.toByteArray();
-
-                FrameBodyAPIC frameBodyAPIC = new FrameBodyAPIC((byte) 0,
-                        "image/png",
-                        (byte)0,
-                        "kopie.png",
-                        data);
-                newFrame.setBody(frameBodyAPIC);
-
-                ArrayList<AbstractID3v2Frame> al = new ArrayList<AbstractID3v2Frame>();
-                al.add(frameOld);
-                al.add(newFrame);
-                tag.frameMap.put("APIC", al);
-            }
-            else if(tag.frameMap.get("APIC") instanceof ArrayList){
-                ID3v24Frame newFrame = new ID3v24Frame("APIC");
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    ImageIO.write(image, "png", baos);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] data = baos.toByteArray();
-
-                FrameBodyAPIC frameBodyAPIC = new FrameBodyAPIC((byte) 0,
-                        "image/png",
-                        (byte)0,
-                        "kopie.png",
-                        data);
-                newFrame.setBody(frameBodyAPIC);
-
-                ((ArrayList)tag.frameMap.get("APIC")).add(newFrame);
-            }
-        }
-    }
-
-
-
-    private void setupPanel() {
+    private void setupPanels() {
         topLevelPanel.setLayout(new MigLayout());
+        jPanelWest.setLayout(new MigLayout());
+        jPanelEast.setLayout(new MigLayout());
+        jPanelSouth.setLayout(new MigLayout());
 
-        topLevelPanel.add(loadMp3, "wrap");
-        topLevelPanel.add(addImage, "wrap");
-        topLevelPanel.add(mp3Info);
+        // setup jList/ Scrollpane
+        jList.setModel(new ImageList());
+        jScrollPaneList = new JScrollPane(jList,
+                VERTICAL_SCROLLBAR_AS_NEEDED,
+                HORIZONTAL_SCROLLBAR_NEVER);
 
+        //West
+        jPanelWest.add(jButtonAddImage);
+        jPanelWest.add(jScrollPaneList);
+
+        //East
+        jPanelEast.add(jButtonLoadMp3);
+        jPanelEast.add(jLabelFrames);
+
+        //South
+
+        //topLevelPanel.add(jButtonAttachPicture, "wrap");
+
+        topLevelPanel.add(jPanelWest);
+        topLevelPanel.add(jPanelEast);
+        topLevelPanel.add(jPanelSouth);
     }
 }
