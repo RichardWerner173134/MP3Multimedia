@@ -18,18 +18,18 @@ public class MP3Model {
         imageModelMap = new HashMap<>();
     }
 
-    public void addImage(String filename, BufferedImage bufferedImage, int starttime, int stoptime){
+    public void addImage(String filename, BufferedImage bufferedImage, int starttime){
         if(imageModelMap.containsKey(filename)){
             imageModelMap.get(filename)
                     .getTimestampsMap()
                     .put(String.valueOf(imageModelMap.get(filename).getTimestampsMap().size() + 1),
-                            new ImageTimestamp(starttime, stoptime));
+                            new ImageTimestamp(starttime));
         } else{
             imageModelMap.put(filename, new ImageModel());
             imageModelMap.get(filename)
                     .getTimestampsMap()
                     .put(String.valueOf(imageModelMap.get(filename).getTimestampsMap().size() + 1),
-                            new ImageTimestamp(starttime, stoptime));
+                            new ImageTimestamp(starttime));
         }
         imageModelMap.get(filename).setBufferedImage(bufferedImage);
 

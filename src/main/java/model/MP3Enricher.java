@@ -136,10 +136,10 @@ public class MP3Enricher {
                 Map.Entry pair2 = (Map.Entry) it2.next();
                 ImageTimestamp ts = (ImageTimestamp) pair2.getValue();
 
-                String datensatz = "\n<img src=\"" + filename + "\"> ";
+                String newline = "\n<img src=\"" + filename + "\"> ";
 
                 try {
-                    baos.write(StandardCharsets.ISO_8859_1.encode(datensatz).array());
+                    baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
