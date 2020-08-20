@@ -1,37 +1,32 @@
 package gui.frame;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import lombok.Getter;
+import model.MP3Model;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
+@Getter
 public class DialogView extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
-    private JTextField textField;
-    private JTextField textField_1;
-    private JTextField textField_2;
+    private JTextField jTextFieldImage;
+    private JTextField jTextFieldStart;
+    private JTextField jTextFieldStop;
+    private JTextField jTextFieldStartH = new JTextField();
+    private JTextField jTextFieldStopH = new JTextField();
+    private JTextField jTextFieldStartM = new JTextField();
+    private JTextField jTextFieldStartS = new JTextField();
+    private JTextField jTextFieldStopM = new JTextField();
+    private JTextField jTextFieldStopS = new JTextField();
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        try {
-            DialogView dialog = new DialogView();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Create the dialog.
      */
-    public DialogView() {
+    public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 450, 300);
@@ -45,28 +40,44 @@ public class DialogView extends JDialog {
             contentPanel.add(lblNewLabel);
         }
 
-        textField = new JTextField();
-        textField.setBounds(155, 12, 250, 37);
-        contentPanel.add(textField);
-        textField.setColumns(10);
+        jTextFieldImage = new JTextField(selectedValue);
+        jTextFieldImage.setBounds(155, 12, 250, 37);
+        jTextFieldImage.setEditable(false);
+        contentPanel.add(jTextFieldImage);
+        jTextFieldImage.setColumns(10);
 
         JLabel lblNewLabel_1 = new JLabel("Startzeit");
         lblNewLabel_1.setBounds(12, 89, 81, 44);
         contentPanel.add(lblNewLabel_1);
 
-        textField_1 = new JTextField();
-        textField_1.setBounds(155, 89, 250, 44);
-        contentPanel.add(textField_1);
-        textField_1.setColumns(10);
-
         JLabel lblNewLabel_2 = new JLabel("Stoppzeit");
         lblNewLabel_2.setBounds(12, 155, 81, 60);
         contentPanel.add(lblNewLabel_2);
 
-        textField_2 = new JTextField();
-        textField_2.setBounds(155, 175, 250, 40);
-        contentPanel.add(textField_2);
-        textField_2.setColumns(10);
+        jTextFieldStartH.setBounds(155, 89, 52, 44);
+        contentPanel.add(jTextFieldStartH);
+        jTextFieldStartH.setColumns(10);
+
+        jTextFieldStopH.setBounds(155, 175, 52, 40);
+        contentPanel.add(jTextFieldStopH);
+        jTextFieldStopH.setColumns(10);
+
+        jTextFieldStartM.setBounds(230, 89, 52, 44);
+        contentPanel.add(jTextFieldStartM);
+        jTextFieldStartM.setColumns(10);
+
+        jTextFieldStartS.setBounds(302, 89, 52, 44);
+        contentPanel.add(jTextFieldStartS);
+        jTextFieldStartS.setColumns(10);
+
+        jTextFieldStopM.setBounds(230, 175, 52, 40);
+        contentPanel.add(jTextFieldStopM);
+        jTextFieldStopM.setColumns(10);
+
+        jTextFieldStopS.setBounds(302, 175, 52, 40);
+        contentPanel.add(jTextFieldStopS);
+        jTextFieldStopS.setColumns(10);
+
         {
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -76,12 +87,40 @@ public class DialogView extends JDialog {
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);
+                okButton.addActionListener(e -> {
+                    try {
+                        int starttimeH = Integer.parseInt(jTextFieldStartH.getText());
+                        int starttimeM = Integer.parseInt(jTextFieldStartM.getText());
+                        int starttimeS = Integer.parseInt(jTextFieldStartS.getText());
+                        int stoptimeH = Integer.parseInt(jTextFieldStopH.getText());
+                        int stoptimeM = Integer.parseInt(jTextFieldStopM.getText());
+                        int stoptimeS = Integer.parseInt(jTextFieldStopS.getText());
+                        int starttimeMillis = timeInMilliSeconds(starttimeH, starttimeM, starttimeS);
+                        int stoptimeMillis = timeInMilliSeconds(stoptimeH, stoptimeM, stoptimeS);
+                        mp3Model.addImage(selectedValue,
+                                bufferedImage,
+                                starttimeMillis,
+                                stoptimeMillis);
+                        dispose();
+                    }catch(NumberFormatException ex){
+                        ex.printStackTrace();
+                    }
+                });
             }
             {
                 JButton cancelButton = new JButton("Cancel");
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
+                cancelButton.addActionListener(e -> dispose());
             }
         }
+    }
+
+    private int timeInMilliSeconds(int hour, int minute, int seconds) {
+        int milliSecondsFromZero = 0;
+        milliSecondsFromZero += seconds * 1000;
+        milliSecondsFromZero += minute * 60 * 1000;
+        milliSecondsFromZero += hour * 60 * 60 * 1000;
+        return milliSecondsFromZero;
     }
 }

@@ -2,6 +2,7 @@ package gui.frame;
 
 import model.ImageList;
 import model.MP3Enricher;
+import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -14,7 +15,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public class EclipseCopyFrame extends JFrame {
     private JMenuItem mntmNewMenuItem = new JMenuItem("New menu item");
     private JMenu mnNewMenu_1 = new JMenu("New menu");
     private JPanel topLayerPanel = new JPanel();
-    private JButton jButtonAddPicture = new JButton("Bild hinzuf\u00FCgen");
+    private JButton jButtonAddPicture = new JButton("Bild importieren");
     private JScrollPane scrollPane_1 = new JScrollPane();
     private JLabel jLabelLoadedPictures = new JLabel("Geladene Bilder");
     private JButton jButtonRemovePicture = new JButton("Bild entfernen");
@@ -45,31 +45,19 @@ public class EclipseCopyFrame extends JFrame {
 
     private JPanel contentPane;
 
-    private MP3File mp3File;
+    private MP3Model mp3Model;
     private ImageList imageList = new ImageList();
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                EclipseCopyFrame frame = new EclipseCopyFrame();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     /**
      * Create the frame.
      */
     public EclipseCopyFrame() {
+        setVisible(true);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1280, 720);
 
+        mp3Model = new MP3Model();
         initPanel();
 
         addActionListeners();
@@ -130,7 +118,8 @@ public class EclipseCopyFrame extends JFrame {
         lblMeinempmp.setBackground(Color.BLACK);
         panel.add(lblMeinempmp);
 
-        progressBar.setEnabled(false);
+        progressBar.setEnabled(true);
+        progressBar.setValue(0);
         progressBar.setBounds(48, 119, 635, 32);
         panel.add(progressBar);
 
@@ -150,6 +139,7 @@ public class EclipseCopyFrame extends JFrame {
     private void addActionListeners() {
         // Hinzufügen einer MP3 über FileChooser
         jButtonAddMP3.addActionListener(e -> {
+            MP3File mp3File = null;
             JFileChooser fileChooser = new JFileChooser();
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -159,7 +149,8 @@ public class EclipseCopyFrame extends JFrame {
                     ex.printStackTrace();
                 }
                 jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
-
+                mp3Model.setMp3File(mp3File);
+                lblMeinempmp.setText(mp3File.getFile().getAbsolutePath());
             }
         });
 
@@ -172,7 +163,6 @@ public class EclipseCopyFrame extends JFrame {
                 list_1.setModel(imageList);
             }
         });
-
 
         // Auswählen eines ListItems in list_1, zeigt Vorschau im jLabelImagePreview darunter
         list_1.addListSelectionListener(e -> {
@@ -193,18 +183,19 @@ public class EclipseCopyFrame extends JFrame {
 
         // Löst Dialog aus, wenn button betätigt wird und ein Bild ausgewählt ist
         jButtonAttachPicture.addActionListener(e -> {
-            JDialog dialog = new JDialog();
-            dialog.setContentPane(new DialogView());
+            String selectedValue = (String)list_1.getSelectedValue();
+            if(selectedValue != null) {
+                BufferedImage bi = imageList.getImageMap().get(selectedValue);
+                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi);
+                dialogView.setEnabled(true);
+            }
 
 
         });
 
-        jMenuItemSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //MP3Enricher.addPicure(mp3File, fileChooser.getSelectedFile(), 200);
-                jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
-            }
+        jMenuItemSave.addActionListener(e -> {
+            MP3Enricher.attachAll(mp3Model);
+            jLabelFrames.setText(MP3Enricher.getMP3Info(mp3Model.getMp3File()));
         });
     }
 }
