@@ -1,12 +1,12 @@
 package model;
 
+import components.MP3Enricher;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 
 class MP3EnricherTest {

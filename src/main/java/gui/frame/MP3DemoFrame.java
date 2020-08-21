@@ -1,7 +1,7 @@
 package gui.frame;
 
 import model.ImageList;
-import model.MP3Enricher;
+import components.MP3Enricher;
 import net.miginfocom.swing.MigLayout;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -15,7 +15,6 @@ import java.awt.*;
 import java.io.IOException;
 
 import static javax.swing.ScrollPaneConstants.*;
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class MP3DemoFrame extends JFrame {

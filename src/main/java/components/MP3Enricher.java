@@ -1,6 +1,9 @@
-package model;
+package components;
 
 import gui.frame.DialogView;
+import model.ImageModel;
+import model.ImageTimestamp;
+import model.MP3Model;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
