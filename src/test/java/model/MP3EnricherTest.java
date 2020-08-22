@@ -40,9 +40,9 @@ class MP3EnricherTest {
             e.printStackTrace();
         }
         im.setBufferedImage(bi);
-        im.getTimestampsMap().put("1", new ImageTimestamp(0));
-        im.getTimestampsMap().put("2", new ImageTimestamp(21));
-        im.getTimestampsMap().put("3", new ImageTimestamp(31));
+        im.getTimestampMap().put("1", new ContentTimeStamp(0));
+        im.getTimestampMap().put("2", new ContentTimeStamp(21));
+        im.getTimestampMap().put("3", new ContentTimeStamp(31));
 
         ImageModel im2 = new ImageModel();
         BufferedImage bi2 = null;
@@ -52,13 +52,13 @@ class MP3EnricherTest {
             e.printStackTrace();
         }
         im2.setBufferedImage(bi);
-        im2.getTimestampsMap().put("1", new ImageTimestamp(41));
-        im2.getTimestampsMap().put("2", new ImageTimestamp(51));
-        im2.getTimestampsMap().put("3", new ImageTimestamp(61));
+        im2.getTimestampMap().put("1", new ContentTimeStamp(41));
+        im2.getTimestampMap().put("2", new ContentTimeStamp(51));
+        im2.getTimestampMap().put("3", new ContentTimeStamp(61));
 
-        mp3Model.getImageModelMap().put("testbild1.png", im);
+        mp3Model.getAbstractContentModelMap().put("testbild1.png", im);
 
-        mp3Model.getImageModelMap().put("testbild2.png", im2);
+        mp3Model.getAbstractContentModelMap().put("testbild2.png", im2);
 
         MP3Enricher.attachAll(mp3Model);
         MP3File mp3File = null;

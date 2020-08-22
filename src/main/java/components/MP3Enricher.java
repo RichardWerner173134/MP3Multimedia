@@ -1,9 +1,6 @@
 package components;
 
-import gui.frame.DialogView;
-import model.ImageModel;
-import model.ImageTimestamp;
-import model.MP3Model;
+import model.*;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
@@ -13,11 +10,9 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -59,25 +54,20 @@ public class MP3Enricher {
         return baos.toByteArray();
     }
 
-    public static void addFrameToMP3(MP3File mp3File, AbstractID3v2Frame frame){
-        String key = "";
-        if(frame.getBody() instanceof FrameBodyAPIC){
-            key = "APIC";
-        }
-
+    public static void addAPICFrame(MP3File mp3File, AbstractID3v2Frame frame){
         ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
 
-        if(!tag.frameMap.containsKey(key)){
+        if(!tag.frameMap.containsKey("APIC")){
             tag.frameMap.put("APIC", new ArrayList<>());
         }
 
-        if(tag.frameMap.get(key) instanceof AbstractID3v2Frame){
-            AbstractID3v2Frame oldFrame = (AbstractID3v2Frame)tag.frameMap.get(key);
-            tag.frameMap.remove(key);
+        if(tag.frameMap.get("APIC") instanceof AbstractID3v2Frame){
+            AbstractID3v2Frame oldFrame = (AbstractID3v2Frame)tag.frameMap.get("APIC");
+            tag.frameMap.remove("APIC");
             ArrayList<AbstractID3v2Frame> list = new ArrayList<>(Collections.singletonList(oldFrame));
-            tag.frameMap.put(key, list);
+            tag.frameMap.put("APIC", list);
         }
-        ((ArrayList)tag.frameMap.get(key)).add(frame);
+        ((ArrayList)tag.frameMap.get("APIC")).add(frame);
     }
 
     public static ID3v24Frame createAPICFrame(byte[] data, String fileName){
@@ -125,39 +115,63 @@ public class MP3Enricher {
     }
     public static void attachAll(MP3Model mp3Model) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
+        Iterator it = mp3Model.getAbstractContentModelMap().entrySet().iterator();
+        
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            BufferedImage bi = ((ImageModel)pair.getValue()).getBufferedImage();
-            String filename = (String) pair.getKey();
-            ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
-            addFrameToMP3(mp3Model.getMp3File(), apicFrame);
 
-            Iterator it2 = ((ImageModel) pair.getValue()).getTimestampsMap().entrySet().iterator();
+            // add APIC Frame
+            if(pair.getValue() instanceof ImageModel){
+                attachImage(pair, mp3Model.getMp3File());
+            }
+
+            // create SYLT Frame with timestamp
+            Iterator it2 = ((AbstractContentModel) pair.getValue()).getTimestampMap().entrySet().iterator();
             while(it2.hasNext()){
 
                 Map.Entry pair2 = (Map.Entry) it2.next();
-                ImageTimestamp ts = (ImageTimestamp) pair2.getValue();
+                if(pair.getValue() instanceof ImageModel) {
+                    ContentTimeStamp ts = (ContentTimeStamp) pair2.getValue();
 
-                String newline = "\n<img src=\"" + filename + "\"> ";
+                    String newline = "\n<img src=\"" + pair.getKey() + "\">";
 
-                try {
-                    baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                byte[] timestampBytes = calcTimestampBytes(ts.getStarttime());
-                try {
-                    baos.write(0x00);
-                    baos.write(timestampBytes);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    byte[] timestampBytes = calcTimestampBytes(ts.getStarttime());
+                    try {
+                        baos.write(0x00);
+                        baos.write(timestampBytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if(pair.getValue() instanceof SubtitleModel){
+                    ContentTimeStamp ts = (ContentTimeStamp) pair2.getValue();
+                    String newline = String.valueOf(pair.getKey());
+                    try {
+                        baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    byte[] timestampBytes = calcTimestampBytes(ts.getStarttime());
+                    try {
+                        baos.write(0x00);
+                        baos.write(timestampBytes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
         }
+
+        // add SYLT Frame
         editSYLTFrame(mp3Model.getMp3File(), baos.toByteArray());
+
         try {
             mp3Model.getMp3File().save();
         } catch (IOException | TagException e) {
@@ -165,14 +179,14 @@ public class MP3Enricher {
         }
     }
 
-    private static byte[] calcTimestampBytes(int starttime) {
-        /*byte syncByte = 0x00;
-        byte b = (byte) 0x0F;
-        byte c = (byte) 0xFF;
-        byte d = (byte) 0xFF;
-        byte e = (byte) 0xFF;
-*/
+    private static void attachImage(Map.Entry pair, MP3File mp3File) {
+        BufferedImage bi = ((ImageModel)pair.getValue()).getBufferedImage();
+        String filename = (String) pair.getKey();
+        ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
+        addAPICFrame(mp3File, apicFrame);
+    }
 
+    private static byte[] calcTimestampBytes(int starttime) {
         return ByteBuffer.allocate(4).putInt(starttime).array();
     }
 }
