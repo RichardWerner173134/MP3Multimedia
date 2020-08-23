@@ -4,15 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 
 @Getter
 @Setter
-public class ImageModel {
-    private HashMap<String, ImageTimestamp> timestampsMap;
+public class ImageModel extends AbstractContentModel{
     private BufferedImage bufferedImage;
 
     public ImageModel(){
-        timestampsMap = new HashMap<>();
+        super();
     }
 }

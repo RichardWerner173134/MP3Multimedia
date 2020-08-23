@@ -1,12 +1,12 @@
 package model;
 
+import components.MP3Enricher;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 
 class MP3EnricherTest {
@@ -40,10 +39,6 @@ class MP3EnricherTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        im.setBufferedImage(bi);
-        im.getTimestampsMap().put("1", new ImageTimestamp(0, 20));
-        im.getTimestampsMap().put("2", new ImageTimestamp(21, 30));
-        im.getTimestampsMap().put("3", new ImageTimestamp(31, 40));
 
         ImageModel im2 = new ImageModel();
         BufferedImage bi2 = null;
@@ -52,14 +47,23 @@ class MP3EnricherTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        im2.setBufferedImage(bi);
-        im2.getTimestampsMap().put("1", new ImageTimestamp(41, 50));
-        im2.getTimestampsMap().put("2", new ImageTimestamp(51, 60));
-        im2.getTimestampsMap().put("3", new ImageTimestamp(61, 70));
 
-        mp3Model.getImageModelMap().put("testbild1.png", im);
+        SubtitleModel sm1 = new SubtitleModel();
+        sm1.getTimestampMap().put("0", new ContentTimeStamp(40));
+        sm1.getTimestampMap().put("1", new ContentTimeStamp(60));
+        sm1.getTimestampMap().put("2", new ContentTimeStamp(23));
 
-        mp3Model.getImageModelMap().put("testbild2.png", im2);
+        mp3Model.addImage("testbild1.png", bi, 0);
+        mp3Model.addImage("testbild1.png", bi, 21);
+        mp3Model.addImage("testbild1.png", bi, 31);
+
+        mp3Model.addImage("testbild2.png", bi2, 41);
+        mp3Model.addImage("testbild2.png", bi2, 51);
+        mp3Model.addImage("testbild2.png", bi2, 61);
+
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 24);
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 33);
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 28);
 
         MP3Enricher.attachAll(mp3Model);
         MP3File mp3File = null;

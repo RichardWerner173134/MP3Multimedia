@@ -1,7 +1,9 @@
 package gui.frame;
 
+import components.AudioPlayer;
+import javazoom.jl.player.Player;
 import model.ImageList;
-import model.MP3Enricher;
+import components.MP3Enricher;
 import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -35,13 +37,14 @@ public class EclipseCopyFrame extends JFrame {
     private JLabel jLabelImagePreview = new JLabel("");
     private JLabel jLabelPreviewText = new JLabel("Bildvorschau");
     private JPanel panel = new JPanel();
-    private JLabel lblMeinempmp = new JLabel("Keine MP3-Datei geladen");
+    private JLabel lblMeinempm3 = new JLabel("Keine MP3-Datei geladen");
     private JProgressBar progressBar = new JProgressBar();
-    private JButton jButtonPlayStop = new JButton("Start/Pause");
+    private JButton jButtonPlayStop = new JButton("Start");
     private JButton jButtonAddMP3 = new JButton("Neue MP3");
     private JLabel jLabelFrames = new JLabel("");
     private JList list_1 = new JList();
     private JButton jButtonAttachPicture = new JButton("Bild einbauen");
+    private JButton jButtonMp3Cursor = new JButton("");
 
     private JPanel contentPane;
 
@@ -113,17 +116,17 @@ public class EclipseCopyFrame extends JFrame {
         contentPane.add(panel);
         panel.setLayout(null);
 
-        lblMeinempmp.setBounds(48, 90, 148, 19);
-        lblMeinempmp.setForeground(Color.GRAY);
-        lblMeinempmp.setBackground(Color.BLACK);
-        panel.add(lblMeinempmp);
+        lblMeinempm3.setBounds(12, 91, 635, 19);
+        lblMeinempm3.setForeground(Color.GRAY);
+        lblMeinempm3.setBackground(Color.BLACK);
+        panel.add(lblMeinempm3);
 
         progressBar.setEnabled(true);
         progressBar.setValue(0);
-        progressBar.setBounds(48, 119, 635, 32);
+        progressBar.setBounds(12, 122, 635, 32);
         panel.add(progressBar);
 
-        jButtonPlayStop.setBounds(124, 10, 104, 21);
+        jButtonPlayStop.setBounds(266, 166, 104, 21);
         panel.add(jButtonPlayStop);
 
         jButtonAddMP3.setBounds(10, 10, 104, 21);
@@ -132,8 +135,13 @@ public class EclipseCopyFrame extends JFrame {
         jLabelFrames.setBounds(48, 202, 148, 194);
         panel.add(jLabelFrames);
 
-        jButtonAttachPicture.setBounds(238, 10, 104, 21);
+        jButtonAttachPicture.setBounds(126, 10, 104, 21);
         panel.add(jButtonAttachPicture);
+
+        jButtonMp3Cursor.setBounds(12, 121, 8, 32);
+        panel.add(jButtonMp3Cursor);
+        jButtonMp3Cursor.setEnabled(false);
+        jButtonMp3Cursor.setForeground(Color.BLACK);
     }
 
     private void addActionListeners() {
@@ -150,7 +158,9 @@ public class EclipseCopyFrame extends JFrame {
                 }
                 jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
                 mp3Model.setMp3File(mp3File);
-                lblMeinempmp.setText(mp3File.getFile().getAbsolutePath());
+                lblMeinempm3.setText(mp3File.getFile().getAbsolutePath());
+                progressBar.setBackground(Color.YELLOW);
+                jButtonMp3Cursor.setEnabled(true);
             }
         });
 
@@ -193,9 +203,33 @@ public class EclipseCopyFrame extends JFrame {
 
         });
 
+        // Save MP3
         jMenuItemSave.addActionListener(e -> {
             MP3Enricher.attachAll(mp3Model);
             jLabelFrames.setText(MP3Enricher.getMP3Info(mp3Model.getMp3File()));
+        });
+
+        // start/stop player
+        jButtonPlayStop.addActionListener(e -> {
+            AudioPlayer player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if(jButtonPlayStop.getText().equals("Start")) {
+                        jButtonPlayStop.setText("Pause");
+                        player.start();
+                        System.out.println("running");
+                    } else if(jButtonPlayStop.getText().equals("Pause")){
+                        jButtonPlayStop.setText("Start");
+                        player.stop();
+                        System.out.println("stopped");
+                    }
+
+                }
+            });
+
+
+            t.start();
         });
     }
 }
