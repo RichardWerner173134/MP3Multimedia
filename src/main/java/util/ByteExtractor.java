@@ -51,7 +51,7 @@ public class ByteExtractor {
                 if(im.getBufferedImage() == null){
                     String imageName = String.valueOf(pair.getKey());
                     for(ID3v24Frame f : apicFrameList){
-                        if(((FrameBodyAPIC)f.getBody()).getDescription().equals(String.valueOf(pair.getKey()).trim())){
+                        if(((FrameBodyAPIC)f.getBody()).getDescription().trim().equals(String.valueOf(pair.getKey()).trim())){
                             byte[] imageData = ((FrameBodyAPIC)f.getBody()).getImageData();
                             ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
                             BufferedImage image = null;
@@ -78,15 +78,16 @@ public class ByteExtractor {
             String contentWithoutTimeStamp = getContentWithoutTimeStamp(splitted[i]);
 
             if(contentWithoutTimeStamp.startsWith("<img src=\"")){
-                contentWithoutTimeStamp = contentWithoutTimeStamp
-                        .replace("<img src=\"", "")
-                        .replace("\">", "");
+                contentWithoutTimeStamp = contentWithoutTimeStamp.replace("<img src=", "");
+                contentWithoutTimeStamp = contentWithoutTimeStamp.replaceAll("\"", "");
                 if(abstractContentModelMap.containsKey(contentWithoutTimeStamp)){
                     model = abstractContentModelMap.get(contentWithoutTimeStamp);
                 } else{
                     model = new ImageModel();
                 }
-            } else{
+            } else if(abstractContentModelMap.containsKey(contentWithoutTimeStamp)){
+                    model = abstractContentModelMap.get(contentWithoutTimeStamp);
+                } else{
                 model = new SubtitleModel();
             }
             model.getTimestampMap().put(

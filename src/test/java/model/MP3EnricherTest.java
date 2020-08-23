@@ -39,10 +39,6 @@ class MP3EnricherTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        im.setBufferedImage(bi);
-        im.getTimestampMap().put("1", new ContentTimeStamp(0));
-        im.getTimestampMap().put("2", new ContentTimeStamp(21));
-        im.getTimestampMap().put("3", new ContentTimeStamp(31));
 
         ImageModel im2 = new ImageModel();
         BufferedImage bi2 = null;
@@ -51,14 +47,23 @@ class MP3EnricherTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        im2.setBufferedImage(bi);
-        im2.getTimestampMap().put("1", new ContentTimeStamp(41));
-        im2.getTimestampMap().put("2", new ContentTimeStamp(51));
-        im2.getTimestampMap().put("3", new ContentTimeStamp(61));
 
-        mp3Model.getAbstractContentModelMap().put("testbild1.png", im);
+        SubtitleModel sm1 = new SubtitleModel();
+        sm1.getTimestampMap().put("0", new ContentTimeStamp(40));
+        sm1.getTimestampMap().put("1", new ContentTimeStamp(60));
+        sm1.getTimestampMap().put("2", new ContentTimeStamp(23));
 
-        mp3Model.getAbstractContentModelMap().put("testbild2.png", im2);
+        mp3Model.addImage("testbild1.png", bi, 0);
+        mp3Model.addImage("testbild1.png", bi, 21);
+        mp3Model.addImage("testbild1.png", bi, 31);
+
+        mp3Model.addImage("testbild2.png", bi2, 41);
+        mp3Model.addImage("testbild2.png", bi2, 51);
+        mp3Model.addImage("testbild2.png", bi2, 61);
+
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 24);
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 33);
+        mp3Model.addSubtitle("Der einzige Subtitle tritt dreimal auf", 28);
 
         MP3Enricher.attachAll(mp3Model);
         MP3File mp3File = null;

@@ -116,55 +116,70 @@ public class MP3Enricher {
     public static void attachAll(MP3Model mp3Model) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Iterator it = mp3Model.getAbstractContentModelMap().entrySet().iterator();
-        
-        while (it.hasNext()) {
+
+        LinkedList<Entry> entryList = new LinkedList<>();
+
+        while(it.hasNext()){
             Map.Entry pair = (Map.Entry)it.next();
-
-            // add APIC Frame
-            if(pair.getValue() instanceof ImageModel){
-                attachImage(pair, mp3Model.getMp3File());
-            }
-
-            // create SYLT Frame with timestamp
             Iterator it2 = ((AbstractContentModel) pair.getValue()).getTimestampMap().entrySet().iterator();
             while(it2.hasNext()){
-
                 Map.Entry pair2 = (Map.Entry) it2.next();
-                if(pair.getValue() instanceof ImageModel) {
-                    ContentTimeStamp ts = (ContentTimeStamp) pair2.getValue();
 
-                    String newline = "\n<img src=\"" + pair.getKey() + "\">";
+                if(pair.getValue() instanceof SubtitleModel){
+                    entryList.add(new Entry(String.valueOf(pair.getKey()), ((ContentTimeStamp) pair2.getValue()).getStarttime(), "sub"));
 
-                    try {
-                        baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    byte[] timestampBytes = calcTimestampBytes(ts.getStarttime());
-                    try {
-                        baos.write(0x00);
-                        baos.write(timestampBytes);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else if(pair.getValue() instanceof SubtitleModel){
-                    ContentTimeStamp ts = (ContentTimeStamp) pair2.getValue();
-                    String newline = String.valueOf(pair.getKey());
-                    try {
-                        baos.write(StandardCharsets.ISO_8859_1.encode(newline).array());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    byte[] timestampBytes = calcTimestampBytes(ts.getStarttime());
-                    try {
-                        baos.write(0x00);
-                        baos.write(timestampBytes);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                } else if(pair.getValue() instanceof ImageModel){
+                    entryList.add(new Entry(String.valueOf(pair.getKey()), ((ContentTimeStamp) pair2.getValue()).getStarttime(), "img"));
                 }
+            }
+        }
+
+        entryList.sort((o1, o2) -> {
+            if (o1.timestamp < o2.timestamp) {
+                //System.out.println(o1.timestamp + " < " + o2.timestamp);
+                return -1;
+            } else if(o1.timestamp == o2.timestamp) {
+                if(o1.type.equals("img") && o2.type.equals("sub")){
+                    // TODO was passiert bei gleichzeitigem Timestamp und unterschiedlichen Types
+                    return -1;
+                } else {
+                    return 0;
+                }
+            } else {
+                //System.out.println(o1.timestamp + " > " + o2.timestamp);
+                return 1;
+            }
+        });
+
+        Iterator<Entry> entryIt = entryList.iterator();
+
+        while(entryIt.hasNext()){
+            Entry e = entryIt.next();
+
+            //APIC Frame hinzufügen
+            if(e.type.equals("img")){
+
+                if(!isImageAttached(mp3Model.getMp3File(), e.key)){
+                    attachImage(((ImageModel)mp3Model.getAbstractContentModelMap().get(e.key)).getBufferedImage(),
+                            e.key,
+                            mp3Model.getMp3File());
+                }
+            }
+
+            // SYLT Frame Bytes generieren bauen
+            try {
+                baos.write(StandardCharsets.ISO_8859_1.encode(e.content).array());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            byte[] timestampBytes = calcTimestampBytes(e.timestamp);
+
+            try {
+                baos.write(0x00);
+                baos.write(timestampBytes);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
 
         }
@@ -179,14 +194,53 @@ public class MP3Enricher {
         }
     }
 
-    private static void attachImage(Map.Entry pair, MP3File mp3File) {
-        BufferedImage bi = ((ImageModel)pair.getValue()).getBufferedImage();
-        String filename = (String) pair.getKey();
+    private static boolean isImageAttached(MP3File mp3File, String key) {
+        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
+        if(tag.frameMap.containsKey("APIC")){
+            if(tag.frameMap.get("APIC") instanceof ArrayList){
+                for(ID3v24Frame f : (ArrayList<ID3v24Frame>)tag.frameMap.get("APIC")){
+                    if (((FrameBodyAPIC)f.getBody()).getDescription().trim().equals(key.trim())){
+                        return true;
+                    }
+                }
+            } else if(tag.frameMap.get("APIC") instanceof ID3v24Frame){
+                return ((FrameBodyAPIC)((ID3v24Frame)tag.frameMap.get("APIC")).getBody()).getDescription().trim().equals(key.trim());
+            }
+        }
+        return false;
+    }
+
+    private static void attachImage(BufferedImage bi, String filename, MP3File mp3File) {
+        if(bi == null || filename == null || mp3File == null){
+            int k = 0;
+        }
         ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
         addAPICFrame(mp3File, apicFrame);
     }
 
     private static byte[] calcTimestampBytes(int starttime) {
         return ByteBuffer.allocate(4).putInt(starttime).array();
+    }
+
+    static class Entry {
+        private String key;
+        private int timestamp;
+        private String type;
+        private String content;
+
+        Entry(String key, int timestamp, String type){
+            this.key = key;
+            this.timestamp = timestamp;
+            this.type = type;
+            trimContent();
+        }
+
+        private void trimContent() {
+            if(type.equals("img")){
+                content = "\n<img src=\"" + key + "\"";
+            } else {
+                content = "\n " + key;
+            }
+        }
     }
 }

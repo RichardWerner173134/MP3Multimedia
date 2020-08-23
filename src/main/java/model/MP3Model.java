@@ -37,11 +37,26 @@ public class MP3Model {
             abstractContentModelMap.put(filename, new ImageModel());
             ((ImageModel)abstractContentModelMap.get(filename))
                     .getTimestampMap()
-                    .put(String.valueOf(((ImageModel)abstractContentModelMap.get(filename)).getTimestampMap().size() + 1),
+                    .put(String.valueOf(abstractContentModelMap.get(filename).getTimestampMap().size() + 1),
                             new ContentTimeStamp(starttime));
         }
         ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
 
+    }
+
+    public void addSubtitle(String subtitleContent, int starttime){
+        if(abstractContentModelMap.containsKey(subtitleContent)){
+            abstractContentModelMap.get(subtitleContent)
+                    .getTimestampMap()
+                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size() + 1),
+                    new ContentTimeStamp(starttime));
+        } else {
+            abstractContentModelMap.put(subtitleContent, new SubtitleModel());
+            abstractContentModelMap.get(subtitleContent)
+                    .getTimestampMap()
+                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size() + 1),
+                            new ContentTimeStamp(starttime));
+        }
     }
 
     public void setMp3File(MP3File mp3File){
