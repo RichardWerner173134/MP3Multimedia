@@ -24,12 +24,27 @@ public class MP3Enricher {
         ID3v24Frame frame = null;
 
         if(tag.frameMap.containsKey("SYLT")){
+            ByteBuffer buff = ByteBuffer.allocate(bytes.length);
+            buff.put(bytes);
+
+            frame = new ID3v24Frame("SYLT");
+            byte[] data = buff.array();
+            FrameBodySYLT framebody = new FrameBodySYLT(0, "eng", 2,
+                    0, "rwernerMultimediaApp", data);
+            frame.setBody(framebody);
+            tag.frameMap.put("SYLT", frame);
+
+            /*
+            TODO Sollen neue SyltZeilen angehängt werden oder nach dem einlesen neu geschrieben werden?
+
             frame = (ID3v24Frame) tag.frameMap.get("SYLT");
             ByteBuffer buff = ByteBuffer.allocate(bytes.length + ((FrameBodySYLT)frame.getBody()).getLyrics().length);
             buff.put(((FrameBodySYLT)frame.getBody()).getLyrics());
             buff.put(bytes);
 
             ((FrameBodySYLT)frame.getBody()).setLyrics(buff.array());
+            */
+
         }
         else{
             ByteBuffer buff = ByteBuffer.allocate(bytes.length);
@@ -150,6 +165,8 @@ public class MP3Enricher {
                 return 1;
             }
         });
+
+
 
         Iterator<Entry> entryIt = entryList.iterator();
 

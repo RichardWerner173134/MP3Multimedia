@@ -104,7 +104,7 @@ public class ByteExtractor {
 
     private static String getContentWithoutTimeStamp(byte[] splittedByteArray) {
         return StandardCharsets.ISO_8859_1.decode(ByteBuffer.wrap(
-                Arrays.copyOfRange(splittedByteArray, 0, splittedByteArray.length - 4)
+                Arrays.copyOfRange(splittedByteArray, 0, splittedByteArray.length - 5)
         )).toString();
 
     }

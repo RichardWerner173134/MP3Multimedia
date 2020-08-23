@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -28,33 +30,47 @@ public class MP3Model {
     public void addImage(String filename, BufferedImage bufferedImage, int starttime){
         if(abstractContentModelMap.containsKey(filename)){
             if(abstractContentModelMap.get(filename) instanceof ImageModel) {
-                ((ImageModel)abstractContentModelMap.get(filename))
-                        .getTimestampMap()
-                        .put(String.valueOf(((ImageModel)abstractContentModelMap.get(filename)).getTimestampMap().size() + 1),
-                                new ContentTimeStamp(starttime));
+                boolean containsIdenticalTimestamp = abstractContentModelMap.get(filename).getTimestampMap().values()
+                        .stream()
+                        .map(ts -> ts.getStarttime())
+                        .collect(Collectors.toList()).contains(starttime);
+                if(!containsIdenticalTimestamp){
+                    ((ImageModel) abstractContentModelMap.get(filename))
+                            .getTimestampMap()
+                            .put(String.valueOf(((ImageModel) abstractContentModelMap.get(filename)).getTimestampMap().size()),
+                                    new ContentTimeStamp(starttime));
+                    ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
+                }
             }
         } else{
             abstractContentModelMap.put(filename, new ImageModel());
             ((ImageModel)abstractContentModelMap.get(filename))
                     .getTimestampMap()
-                    .put(String.valueOf(abstractContentModelMap.get(filename).getTimestampMap().size() + 1),
+                    .put(String.valueOf(abstractContentModelMap.get(filename).getTimestampMap().size()),
                             new ContentTimeStamp(starttime));
+            ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
         }
-        ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
 
     }
 
     public void addSubtitle(String subtitleContent, int starttime){
         if(abstractContentModelMap.containsKey(subtitleContent)){
-            abstractContentModelMap.get(subtitleContent)
-                    .getTimestampMap()
-                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size() + 1),
-                    new ContentTimeStamp(starttime));
+            boolean containsIdenticalTimestamp = abstractContentModelMap.get(subtitleContent).getTimestampMap().values()
+                    .stream()
+                    .map(ts -> ts.getStarttime())
+                    .collect(Collectors.toList()).contains(starttime);
+
+            if(!containsIdenticalTimestamp) {
+                abstractContentModelMap.get(subtitleContent)
+                        .getTimestampMap()
+                        .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size()),
+                                new ContentTimeStamp(starttime));
+            }
         } else {
             abstractContentModelMap.put(subtitleContent, new SubtitleModel());
             abstractContentModelMap.get(subtitleContent)
                     .getTimestampMap()
-                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size() + 1),
+                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size()),
                             new ContentTimeStamp(starttime));
         }
     }

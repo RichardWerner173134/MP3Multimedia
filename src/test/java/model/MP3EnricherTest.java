@@ -32,7 +32,6 @@ class MP3EnricherTest {
             e.printStackTrace();
         }
 
-        ImageModel im = new ImageModel();
         BufferedImage bi = null;
         try {
             bi = ImageIO.read(new File("C:/Users/Richard/Documents/testbild1.png"));
@@ -40,18 +39,12 @@ class MP3EnricherTest {
             e.printStackTrace();
         }
 
-        ImageModel im2 = new ImageModel();
         BufferedImage bi2 = null;
         try {
             bi2 = ImageIO.read(new File("C:/Users/Richard/Documents/testbild2.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        SubtitleModel sm1 = new SubtitleModel();
-        sm1.getTimestampMap().put("0", new ContentTimeStamp(40));
-        sm1.getTimestampMap().put("1", new ContentTimeStamp(60));
-        sm1.getTimestampMap().put("2", new ContentTimeStamp(23));
 
         mp3Model.addImage("testbild1.png", bi, 0);
         mp3Model.addImage("testbild1.png", bi, 21);
