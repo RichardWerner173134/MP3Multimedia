@@ -87,7 +87,7 @@ public class ByteExtractor {
                 }
             } else if(abstractContentModelMap.containsKey(contentWithoutTimeStamp)){
                     model = abstractContentModelMap.get(contentWithoutTimeStamp);
-                } else{
+            } else{
                 model = new SubtitleModel();
             }
             model.getTimestampMap().put(

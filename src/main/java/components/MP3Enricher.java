@@ -204,11 +204,20 @@ public class MP3Enricher {
         // add SYLT Frame
         editSYLTFrame(mp3Model.getMp3File(), baos.toByteArray());
 
+        saveFile(mp3Model.getMp3File());
+
+
+    }
+
+    public static int saveFile(MP3File mp3File) {
         try {
-            mp3Model.getMp3File().save();
+            if(false){
+                mp3File.save();
+            }
         } catch (IOException | TagException e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
     private static boolean isImageAttached(MP3File mp3File, String key) {
@@ -228,9 +237,6 @@ public class MP3Enricher {
     }
 
     private static void attachImage(BufferedImage bi, String filename, MP3File mp3File) {
-        if(bi == null || filename == null || mp3File == null){
-            int k = 0;
-        }
         ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
         addAPICFrame(mp3File, apicFrame);
     }
