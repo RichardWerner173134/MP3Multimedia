@@ -2,28 +2,31 @@ package components;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
-import javazoom.jl.player.advanced.AdvancedPlayer;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class AudioPlayer{
    private FileInputStream fis;
    private BufferedInputStream bis;
    private Player player;
+   private Thread timerThread;
+   private int songLength;
 
-   public void play(String path){
+   public AudioPlayer(String path){
        try {
            fis = new FileInputStream(path);
            bis = new BufferedInputStream(fis);
            player = new Player(bis);
-       } catch (FileNotFoundException | JavaLayerException e) {
+           songLength = fis.available();
+       } catch (JavaLayerException | IOException e) {
            e.printStackTrace();
        }
+   }
+
+   public void play(String path){
        new Thread(() -> {
            try {
                player.play();
@@ -31,12 +34,15 @@ public class AudioPlayer{
                e.printStackTrace();
            }
        }).start();
+
+       timerThread = new Thread(() -> {
+           ;
+       });
+        timerThread.start();
    }
 
    public void stop(){
-       if(player != null){
-           player.close();
-       }
+       player.close();
    }
 
 

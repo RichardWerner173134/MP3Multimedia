@@ -1,6 +1,6 @@
 package gui.frame;
 
-import model.ImageList;
+import model.ImageListModel;
 import components.MP3Enricher;
 import net.miginfocom.swing.MigLayout;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -36,7 +36,7 @@ public class MP3DemoFrame extends JFrame {
     private JPanel jPanelEast = new JPanel();
     private JPanel jPanelSouth = new JPanel();
 
-    private ImageList imageList = new ImageList();
+    private ImageListModel imageList = new ImageListModel();
 
     public MP3DemoFrame(){
         setContentPane(topLevelPanel);
@@ -91,7 +91,7 @@ public class MP3DemoFrame extends JFrame {
         jPanelSouth.setLayout(new MigLayout());
 
         // setup jList/ Scrollpane
-        jList.setModel(new ImageList());
+        jList.setModel(new ImageListModel());
         jScrollPaneList = new JScrollPane(jList,
                 VERTICAL_SCROLLBAR_AS_NEEDED,
                 HORIZONTAL_SCROLLBAR_NEVER);
