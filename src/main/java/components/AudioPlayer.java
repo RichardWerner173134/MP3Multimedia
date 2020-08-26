@@ -1,65 +1,42 @@
 package components;
 
 import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class AudioPlayer{
-   private String filepath;
-   private AdvancedPlayer advancedPlayer;
    private FileInputStream fis;
-   private Thread starter;
+   private BufferedInputStream bis;
+   private Player player;
 
-   public AudioPlayer(String filepath){
-       this.filepath = filepath;
+   public void play(String path){
        try {
-           fis = new FileInputStream(filepath);
-           advancedPlayer = new AdvancedPlayer(fis);
+           fis = new FileInputStream(path);
+           bis = new BufferedInputStream(fis);
+           player = new Player(bis);
        } catch (FileNotFoundException | JavaLayerException e) {
            e.printStackTrace();
        }
-
-       starter = new Thread(new Runnable() {
-           @Override
-           public void run() {
-               try {
-                   advancedPlayer.play();
-               } catch (JavaLayerException e) {
-                   e.printStackTrace();
-               }
+       new Thread(() -> {
+           try {
+               player.play();
+           } catch (JavaLayerException e) {
+               e.printStackTrace();
            }
-       });
-   }
-
-   public void start(){
-       starter.start();
+       }).start();
    }
 
    public void stop(){
-       Method m = null;
-       try {
-           m = Thread.class.getDeclaredMethod( "stop0" , new Class[]{Object.class} );
-       } catch (NoSuchMethodException e) {
-           e.printStackTrace();
+       if(player != null){
+           player.close();
        }
-
-       m.setAccessible( true );
-
-       try {
-           m.invoke( starter , new ThreadDeath() );
-       } catch (IllegalAccessException | InvocationTargetException e) {
-           e.printStackTrace();
-       }
-       starter.stop();
    }
 
 

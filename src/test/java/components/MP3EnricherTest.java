@@ -31,10 +31,6 @@ import static org.mockito.Mockito.when;
 
 class MP3EnricherTest {
 
-    @Before
-    public void prepare(){
-        when(MP3Enricher.saveFile(any())).thenReturn(0);
-    }
     @Test
     void attachAllToNewMP3() {
         MP3Model mp3Model = new MP3Model();

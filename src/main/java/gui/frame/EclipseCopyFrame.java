@@ -51,6 +51,9 @@ public class EclipseCopyFrame extends JFrame {
     private MP3Model mp3Model;
     private ImageList imageList = new ImageList();
 
+    private AudioPlayer player = new AudioPlayer();
+
+
     /**
      * Create the frame.
      */
@@ -211,25 +214,13 @@ public class EclipseCopyFrame extends JFrame {
 
         // start/stop player
         jButtonPlayStop.addActionListener(e -> {
-            AudioPlayer player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if(jButtonPlayStop.getText().equals("Start")) {
-                        jButtonPlayStop.setText("Pause");
-                        player.start();
-                        System.out.println("running");
-                    } else if(jButtonPlayStop.getText().equals("Pause")){
-                        jButtonPlayStop.setText("Start");
-                        player.stop();
-                        System.out.println("stopped");
-                    }
-
-                }
-            });
-
-
-            t.start();
+            if(jButtonPlayStop.getText().equals("Start")){
+                player.play(mp3Model.getMp3File().getFile().getAbsolutePath());
+                jButtonPlayStop.setText("Stop");
+            } else if(jButtonPlayStop.getText().equals("Stop")){
+                player.stop();
+                jButtonPlayStop.setText("Start");
+            }
         });
     }
 }
