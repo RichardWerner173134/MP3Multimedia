@@ -20,54 +20,72 @@ import java.io.IOException;
 public class EclipseCopyFrame extends JFrame {
 
     private void initComponents() {
+        //Menu
         menuBar = new JMenuBar();
-        mnNewMenu = new JMenu("New menu");
-        mntmNewMenuItem_1 = new JMenuItem("New menu item");
-        jMenuItemSave = new JMenuItem("Save");
-        mntmNewMenuItem = new JMenuItem("New menu item");
-        mnNewMenu_1 = new JMenu("New menu");
-        topLayerPanel = new JPanel();
-        jButtonAddPicture = new JButton("Bild importieren");
-        scrollPane_1 = new JScrollPane();
-        jLabelLoadedPictures = new JLabel("Geladene Bilder");
-        jButtonRemovePicture = new JButton("Bild entfernen");
-        jButtonShowPicture = new JButton("Bild anzeigen");
-        jLabelImagePreview = new JLabel("");
-        jLabelPreviewText = new JLabel("Bildvorschau");
-        panel = new JPanel();
-        lblMeinempm3 = new JLabel("Keine MP3-Datei geladen");
-        progressBar = new JProgressBar();
-        jButtonPlayStop = new JButton("Start");
-        jButtonAddMP3 = new JButton("Neue MP3");
+
+            // Menu File
+            jMenuFile = new JMenu("File");
+                jMenuFileItem1 = new JMenuItem("New menu item");
+                jMenuFileItem2 = new JMenuItem("New menu item");
+                jMenuFileItemSave = new JMenuItem("Save");
+            jMenu2 = new JMenu("New menu");
+
+        // Left Component of Frame
+        jPanelWest = new JPanel();
+
+            // ImageList
+            scrollPaneImages = new JScrollPane();
+            jLabelLoadedPictures = new JLabel("Geladene Bilder");
+            imageList = new JList();
+
+            // Buttons
+            jButtonImportImage = new JButton("Bild importieren");
+            jButtonShowPicture = new JButton("Bild anzeigen");
+            jButtonRemovePicture = new JButton("Bild entfernen");
+
+            // ImagePreview
+            jLabelImagePreview = new JLabel("");
+            jLabelPreviewText = new JLabel("Bildvorschau");
+
+        // right Component of Frame
+        jPanelEast = new JPanel();
+            // Buttons
+            jButtonAddMP3 = new JButton("Neue MP3");
+            jButtonAttachPicture = new JButton("Bild einbauen");
+
+            // Player
+            jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
+            jProgressBarMP3Bar = new JProgressBar();
+            jButtonMp3Cursor = new JButton("");
+            jButtonPlayStop = new JButton("Start");
+
+        // displaying Frames, for testing purposes
         jLabelFrames = new JLabel("");
-        list_1 = new JList();
-        jButtonAttachPicture = new JButton("Bild einbauen");
-        jButtonMp3Cursor = new JButton("");
     }
-    private JMenuBar menuBar;
-    private JMenu mnNewMenu;
-    private JMenuItem mntmNewMenuItem_1;
-    private JMenuItem jMenuItemSave;
-    private JMenuItem mntmNewMenuItem;
-    private JMenu mnNewMenu_1;
-    private JPanel topLayerPanel;
-    private JButton jButtonAddPicture;
-    private JScrollPane scrollPane_1;
-    private JLabel jLabelLoadedPictures;
-    private JButton jButtonRemovePicture;
-    private JButton jButtonShowPicture;
-    private JLabel jLabelImagePreview;
-    private JLabel jLabelPreviewText;
-    private JPanel panel;
-    private JLabel lblMeinempm3;
-    private JProgressBar progressBar;
-    private JButton jButtonPlayStop;
-    private JButton jButtonAddMP3;
-    private JLabel jLabelFrames;
-    private JList list_1;
-    private JButton jButtonAttachPicture;
-    private JButton jButtonMp3Cursor;
-    private JPanel contentPane;
+    private JMenuBar        menuBar;
+    private JMenu           jMenuFile;
+    private JMenuItem       jMenuFileItem1;
+    private JMenuItem       jMenuFileItemSave;
+    private JMenuItem       jMenuFileItem2;
+    private JMenu           jMenu2;
+    private JPanel          jPanelWest;
+    private JButton         jButtonImportImage;
+    private JScrollPane     scrollPaneImages;
+    private JLabel          jLabelLoadedPictures;
+    private JButton         jButtonRemovePicture;
+    private JButton         jButtonShowPicture;
+    private JLabel          jLabelImagePreview;
+    private JLabel          jLabelPreviewText;
+    private JPanel          jPanelEast;
+    private JLabel          jLabelMP3Name;
+    private JProgressBar    jProgressBarMP3Bar;
+    private JButton         jButtonPlayStop;
+    private JButton         jButtonAddMP3;
+    private JLabel          jLabelFrames;
+    private JList           imageList;
+    private JButton         jButtonAttachPicture;
+    private JButton         jButtonMp3Cursor;
+    private JPanel          contentPane;
 
     private MP3Model mp3Model;
     private ImageListModel imageListModel = new ImageListModel();
@@ -96,77 +114,77 @@ public class EclipseCopyFrame extends JFrame {
     private void initPanel() {
         setJMenuBar(menuBar);
 
-        menuBar.add(mnNewMenu);
+        menuBar.add(jMenuFile);
 
-        mnNewMenu.add(mntmNewMenuItem_1);
+        jMenuFile.add(jMenuFileItem1);
 
-        mnNewMenu.add(jMenuItemSave);
+        jMenuFile.add(jMenuFileItemSave);
 
-        menuBar.add(mnNewMenu_1);
+        menuBar.add(jMenu2);
 
-        mnNewMenu_1.add(mntmNewMenuItem);
+        jMenu2.add(jMenuFileItem2);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        topLayerPanel.setBounds(10, 10, 414, 463);
-        contentPane.add(topLayerPanel);
-        topLayerPanel.setLayout(null);
+        jPanelWest.setBounds(10, 10, 414, 463);
+        contentPane.add(jPanelWest);
+        jPanelWest.setLayout(null);
 
-        jButtonAddPicture.setBounds(203, 7, 131, 21);
-        topLayerPanel.add(jButtonAddPicture);
+        jButtonImportImage.setBounds(203, 7, 131, 21);
+        jPanelWest.add(jButtonImportImage);
 
-        scrollPane_1.setBounds(10, 10, 168, 219);
-        topLayerPanel.add(scrollPane_1);
+        scrollPaneImages.setBounds(10, 10, 168, 219);
+        jPanelWest.add(scrollPaneImages);
 
-        list_1.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
-        scrollPane_1.setViewportView(list_1);
+        imageList.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
+        scrollPaneImages.setViewportView(imageList);
 
-        scrollPane_1.setColumnHeaderView(jLabelLoadedPictures);
-        scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPaneImages.setColumnHeaderView(jLabelLoadedPictures);
+        scrollPaneImages.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jButtonRemovePicture.setBounds(203, 96, 131, 21);
-        topLayerPanel.add(jButtonRemovePicture);
+        jPanelWest.add(jButtonRemovePicture);
 
         jButtonShowPicture.setBounds(203, 50, 131, 21);
-        topLayerPanel.add(jButtonShowPicture);
+        jPanelWest.add(jButtonShowPicture);
 
         jLabelImagePreview.setBounds(10, 251, 168, 106);
-        topLayerPanel.add(jLabelImagePreview);
+        jPanelWest.add(jLabelImagePreview);
 
         jLabelPreviewText.setBounds(10, 369, 168, 82);
-        topLayerPanel.add(jLabelPreviewText);
+        jPanelWest.add(jLabelPreviewText);
 
-        panel.setBounds(474, 10, 727, 463);
-        contentPane.add(panel);
-        panel.setLayout(null);
+        jPanelEast.setBounds(474, 10, 727, 463);
+        contentPane.add(jPanelEast);
+        jPanelEast.setLayout(null);
 
-        lblMeinempm3.setBounds(12, 91, 635, 19);
-        lblMeinempm3.setForeground(Color.GRAY);
-        lblMeinempm3.setBackground(Color.BLACK);
-        panel.add(lblMeinempm3);
+        jLabelMP3Name.setBounds(12, 91, 635, 19);
+        jLabelMP3Name.setForeground(Color.GRAY);
+        jLabelMP3Name.setBackground(Color.BLACK);
+        jPanelEast.add(jLabelMP3Name);
 
-        progressBar.setEnabled(true);
-        progressBar.setValue(0);
-        progressBar.setBounds(12, 122, 635, 32);
-        panel.add(progressBar);
+        jProgressBarMP3Bar.setEnabled(true);
+        jProgressBarMP3Bar.setValue(0);
+        jProgressBarMP3Bar.setBounds(12, 122, 635, 32);
+        jPanelEast.add(jProgressBarMP3Bar);
 
         jButtonPlayStop.setBounds(266, 166, 104, 21);
         jButtonPlayStop.setEnabled(false);
-        panel.add(jButtonPlayStop);
+        jPanelEast.add(jButtonPlayStop);
 
         jButtonAddMP3.setBounds(10, 10, 104, 21);
-        panel.add(jButtonAddMP3);
+        jPanelEast.add(jButtonAddMP3);
 
         jLabelFrames.setBounds(48, 202, 148, 194);
-        panel.add(jLabelFrames);
+        jPanelEast.add(jLabelFrames);
 
         jButtonAttachPicture.setBounds(126, 10, 104, 21);
-        panel.add(jButtonAttachPicture);
+        jPanelEast.add(jButtonAttachPicture);
 
         jButtonMp3Cursor.setBounds(12, 121, 8, 32);
-        panel.add(jButtonMp3Cursor);
+        jPanelEast.add(jButtonMp3Cursor);
         jButtonMp3Cursor.setEnabled(false);
         jButtonMp3Cursor.setForeground(Color.BLACK);
     }
@@ -185,8 +203,8 @@ public class EclipseCopyFrame extends JFrame {
                 }
                 jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
                 mp3Model.setMp3File(mp3File);
-                lblMeinempm3.setText(mp3File.getFile().getAbsolutePath());
-                progressBar.setBackground(Color.YELLOW);
+                jLabelMP3Name.setText(mp3File.getFile().getAbsolutePath());
+                jProgressBarMP3Bar.setBackground(Color.YELLOW);
                 jButtonMp3Cursor.setEnabled(true);
 
                 player = new AudioPlayer(mp3File.getFile().getAbsolutePath());
@@ -195,17 +213,17 @@ public class EclipseCopyFrame extends JFrame {
         });
 
         // Importieren von Bilddatei
-        jButtonAddPicture.addActionListener(e -> {
+        jButtonImportImage.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if(returnVal == JFileChooser.APPROVE_OPTION){
                 imageListModel.addImage(fileChooser.getSelectedFile());
-                list_1.setModel(imageListModel);
+                imageList.setModel(imageListModel);
             }
         });
 
         // Auswählen eines ListItems in list_1, zeigt Vorschau im jLabelImagePreview darunter
-        list_1.addListSelectionListener(e -> {
+        imageList.addListSelectionListener(e -> {
             String selectedValue = (String)((JList) e.getSource()).getSelectedValue();
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
@@ -223,7 +241,7 @@ public class EclipseCopyFrame extends JFrame {
 
         // Löst Dialog aus, wenn button betätigt wird und ein Bild ausgewählt ist
         jButtonAttachPicture.addActionListener(e -> {
-            String selectedValue = (String)list_1.getSelectedValue();
+            String selectedValue = (String) imageList.getSelectedValue();
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
                 DialogView dialogView = new DialogView(selectedValue, mp3Model, bi);
@@ -234,7 +252,7 @@ public class EclipseCopyFrame extends JFrame {
         });
 
         // Save MP3
-        jMenuItemSave.addActionListener(e -> {
+        jMenuFileItemSave.addActionListener(e -> {
             MP3Enricher.attachAll(mp3Model);
             jLabelFrames.setText(MP3Enricher.getMP3Info(mp3Model.getMp3File()));
         });
@@ -262,6 +280,6 @@ public class EclipseCopyFrame extends JFrame {
         this.jButtonMp3Cursor.setEnabled(false);
 
         this.mp3Model = null;
-        this.progressBar.setBackground(Color.gray);
+        this.jProgressBarMP3Bar.setBackground(Color.gray);
     }
 }
