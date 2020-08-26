@@ -1,5 +1,4 @@
 import gui.frame.EclipseCopyFrame;
-import gui.frame.MP3DemoFrame;
 
 import java.awt.*;
 

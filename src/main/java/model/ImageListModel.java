@@ -1,6 +1,7 @@
 package model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -10,11 +11,12 @@ import java.io.IOException;
 import java.util.HashMap;
 
 @Getter
-public class ImageList extends DefaultListModel{
+@Setter
+public class ImageListModel extends DefaultListModel{
 
     private HashMap<String, BufferedImage> imageMap;
 
-    public ImageList() {
+    public ImageListModel() {
         imageMap = new HashMap<>();
     }
 
