@@ -1,9 +1,7 @@
 package util;
 
-import model.AbstractContentModel;
 import model.ContentTimeStamp;
 import model.ImageModel;
-import model.SubtitleModel;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 
@@ -34,14 +32,14 @@ public class ByteExtractor {
         byte[] regex = {0x0A};
         byte[][] splitted = splitByteArray(data, regex, charset);
 
-        HashMap<String, AbstractContentModel> abstractContentModelMap = generateAbstractContentModelMap(splitted);
-        addApicImages(abstractContentModelMap, apicFrameList);
+        HashMap<String, ImageModel> imageModeMap = generateImageModelMap(splitted);
+        addApicImages(imageModeMap, apicFrameList);
 
-        return abstractContentModelMap;
+        return imageModeMap;
     }
 
-    private static void addApicImages(HashMap<String, AbstractContentModel> abstractContentModelMap, ArrayList<ID3v24Frame> apicFrameList) {
-        Iterator it = abstractContentModelMap.entrySet().iterator();
+    private static void addApicImages(HashMap<String, ImageModel> imageModelMap, ArrayList<ID3v24Frame> apicFrameList) {
+        Iterator it = imageModelMap.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry pair = (Map.Entry) it.next();
 
@@ -51,7 +49,7 @@ public class ByteExtractor {
                 if(im.getBufferedImage() == null){
                     String imageName = String.valueOf(pair.getKey());
                     for(ID3v24Frame f : apicFrameList){
-                        if(((FrameBodyAPIC)f.getBody()).getDescription().trim().equals(String.valueOf(pair.getKey()).trim())){
+                        if(((FrameBodyAPIC)f.getBody()).getDescription().trim().equals(imageName.trim())){
                             byte[] imageData = ((FrameBodyAPIC)f.getBody()).getImageData();
                             ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
                             BufferedImage image = null;
@@ -69,37 +67,30 @@ public class ByteExtractor {
         }
     }
 
-    private static HashMap generateAbstractContentModelMap(byte[][] splitted) {
+    private static HashMap generateImageModelMap(byte[][] splitted) {
 
-        HashMap<String, AbstractContentModel> abstractContentModelMap = new HashMap<>();
-        AbstractContentModel model;
+        HashMap<String, ImageModel> imageModelMap = new HashMap<>();
+        ImageModel model;
         for(int i = 1; i < splitted.length; i++){
             int timeStampNumber = getTimeStampNumber(splitted[i]);
             String contentWithoutTimeStamp = getContentWithoutTimeStamp(splitted[i]);
 
-            if(contentWithoutTimeStamp.startsWith("<img src=\"")){
-                contentWithoutTimeStamp = contentWithoutTimeStamp.replace("<img src=", "");
-                contentWithoutTimeStamp = contentWithoutTimeStamp.replaceAll("\"", "");
-                if(abstractContentModelMap.containsKey(contentWithoutTimeStamp)){
-                    model = abstractContentModelMap.get(contentWithoutTimeStamp);
-                } else{
-                    model = new ImageModel();
-                }
-            } else if(abstractContentModelMap.containsKey(contentWithoutTimeStamp)){
-                    model = abstractContentModelMap.get(contentWithoutTimeStamp);
+            if(imageModelMap.containsKey(contentWithoutTimeStamp)){
+                model = imageModelMap.get(contentWithoutTimeStamp);
             } else{
-                model = new SubtitleModel();
+                model = new ImageModel();
             }
+
             model.getTimestampMap().put(
                     String.valueOf(model.getTimestampMap().size()),
                     new ContentTimeStamp(timeStampNumber));
 
-            abstractContentModelMap.put(contentWithoutTimeStamp, model);
+            imageModelMap.put(contentWithoutTimeStamp, model);
 
             // System.out.println((char)b1 + "," + (char)b2 + "," + (char)b3 + "," + (char)b4);
             // System.out.println((b1 & 0xff) + " " + "," + (b2 & 0xff) + " " + "," + (b3 & 0xff) + " " + "," + (b4 & 0xff) + " ");
         }
-        return abstractContentModelMap;
+        return imageModelMap;
     }
 
     private static String getContentWithoutTimeStamp(byte[] splittedByteArray) {

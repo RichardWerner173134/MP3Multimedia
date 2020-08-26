@@ -19,49 +19,6 @@ import java.io.IOException;
 
 public class EclipseCopyFrame extends JFrame {
 
-    private void initComponents() {
-        //Menu
-        menuBar = new JMenuBar();
-
-            // Menu File
-            jMenuFile = new JMenu("File");
-                jMenuFileItem1 = new JMenuItem("New menu item");
-                jMenuFileItem2 = new JMenuItem("New menu item");
-                jMenuFileItemSave = new JMenuItem("Save");
-            jMenu2 = new JMenu("New menu");
-
-        // Left Component of Frame
-        jPanelWest = new JPanel();
-
-            // ImageList
-            scrollPaneImages = new JScrollPane();
-            jLabelLoadedPictures = new JLabel("Geladene Bilder");
-            imageList = new JList();
-
-            // Buttons
-            jButtonImportImage = new JButton("Bild importieren");
-            jButtonShowPicture = new JButton("Bild anzeigen");
-            jButtonRemovePicture = new JButton("Bild entfernen");
-
-            // ImagePreview
-            jLabelImagePreview = new JLabel("");
-            jLabelPreviewText = new JLabel("Bildvorschau");
-
-        // right Component of Frame
-        jPanelEast = new JPanel();
-            // Buttons
-            jButtonAddMP3 = new JButton("Neue MP3");
-            jButtonAttachPicture = new JButton("Bild einbauen");
-
-            // Player
-            jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
-            jProgressBarMP3Bar = new JProgressBar();
-            jButtonMp3Cursor = new JButton("");
-            jButtonPlayStop = new JButton("Start");
-
-        // displaying Frames, for testing purposes
-        jLabelFrames = new JLabel("");
-    }
     private JMenuBar        menuBar;
     private JMenu           jMenuFile;
     private JMenuItem       jMenuFileItem1;
@@ -281,5 +238,49 @@ public class EclipseCopyFrame extends JFrame {
 
         this.mp3Model = null;
         this.jProgressBarMP3Bar.setBackground(Color.gray);
+    }
+
+    private void initComponents() {
+        //Menu
+        menuBar = new JMenuBar();
+
+            // Menu File
+            jMenuFile = new JMenu("File");
+                jMenuFileItem1 = new JMenuItem("New menu item");
+                jMenuFileItem2 = new JMenuItem("New menu item");
+                jMenuFileItemSave = new JMenuItem("Save");
+            jMenu2 = new JMenu("New menu");
+
+        // Left Component of Frame
+        jPanelWest = new JPanel();
+
+            // ImageList
+            scrollPaneImages = new JScrollPane();
+            jLabelLoadedPictures = new JLabel("Geladene Bilder");
+            imageList = new JList();
+
+            // Buttons
+            jButtonImportImage = new JButton("Bild importieren");
+            jButtonShowPicture = new JButton("Bild anzeigen");
+            jButtonRemovePicture = new JButton("Bild entfernen");
+
+            // ImagePreview
+            jLabelImagePreview = new JLabel("");
+            jLabelPreviewText = new JLabel("Bildvorschau");
+
+        // right Component of Frame
+        jPanelEast = new JPanel();
+            // Buttons
+            jButtonAddMP3 = new JButton("Neue MP3");
+            jButtonAttachPicture = new JButton("Bild einbauen");
+
+            // Player
+            jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
+            jProgressBarMP3Bar = new JProgressBar();
+            jButtonMp3Cursor = new JButton("");
+            jButtonPlayStop = new JButton("Start");
+
+        // displaying Frames, for testing purposes
+        jLabelFrames = new JLabel("");
     }
 }

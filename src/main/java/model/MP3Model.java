@@ -10,77 +10,52 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import util.ByteExtractor;
 
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class MP3Model {
     private MP3File mp3File;
-    private HashMap<String, AbstractContentModel> abstractContentModelMap;
+    private HashMap<String, ImageModel> imageModelMap;
 
     public MP3Model(){
-        abstractContentModelMap = new HashMap<>();
+        imageModelMap = new HashMap<>();
     }
 
     public void addImage(String filename, BufferedImage bufferedImage, int starttime){
-        if(abstractContentModelMap.containsKey(filename)){
-            if(abstractContentModelMap.get(filename) instanceof ImageModel) {
-                boolean containsIdenticalTimestamp = abstractContentModelMap.get(filename).getTimestampMap().values()
+        if(imageModelMap.containsKey(filename)){
+            if(imageModelMap.get(filename) instanceof ImageModel) {
+                boolean containsIdenticalTimestamp = imageModelMap.get(filename).getTimestampMap().values()
                         .stream()
                         .map(ts -> ts.getStarttime())
                         .collect(Collectors.toList()).contains(starttime);
                 if(!containsIdenticalTimestamp){
-                    ((ImageModel) abstractContentModelMap.get(filename))
+                    imageModelMap.get(filename)
                             .getTimestampMap()
-                            .put(String.valueOf(((ImageModel) abstractContentModelMap.get(filename)).getTimestampMap().size()),
+                            .put(String.valueOf(imageModelMap.get(filename).getTimestampMap().size()),
                                     new ContentTimeStamp(starttime));
-                    ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
+                    imageModelMap.get(filename).setBufferedImage(bufferedImage);
                 }
             }
         } else{
-            abstractContentModelMap.put(filename, new ImageModel());
-            ((ImageModel)abstractContentModelMap.get(filename))
+            imageModelMap.put(filename, new ImageModel());
+            imageModelMap.get(filename)
                     .getTimestampMap()
-                    .put(String.valueOf(abstractContentModelMap.get(filename).getTimestampMap().size()),
+                    .put(String.valueOf(imageModelMap.get(filename).getTimestampMap().size()),
                             new ContentTimeStamp(starttime));
-            ((ImageModel)abstractContentModelMap.get(filename)).setBufferedImage(bufferedImage);
+            imageModelMap.get(filename).setBufferedImage(bufferedImage);
         }
 
-    }
-
-    public void addSubtitle(String subtitleContent, int starttime){
-        if(abstractContentModelMap.containsKey(subtitleContent)){
-            boolean containsIdenticalTimestamp = abstractContentModelMap.get(subtitleContent).getTimestampMap().values()
-                    .stream()
-                    .map(ts -> ts.getStarttime())
-                    .collect(Collectors.toList()).contains(starttime);
-
-            if(!containsIdenticalTimestamp) {
-                abstractContentModelMap.get(subtitleContent)
-                        .getTimestampMap()
-                        .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size()),
-                                new ContentTimeStamp(starttime));
-            }
-        } else {
-            abstractContentModelMap.put(subtitleContent, new SubtitleModel());
-            abstractContentModelMap.get(subtitleContent)
-                    .getTimestampMap()
-                    .put(String.valueOf(abstractContentModelMap.get(subtitleContent).getTimestampMap().size()),
-                            new ContentTimeStamp(starttime));
-        }
     }
 
     public void setMp3File(MP3File mp3File){
         this.mp3File = mp3File;
-        loadAbstractContentModel();
+        loadImageModelMap();
     }
 
-    private void loadAbstractContentModel() {
+    private void loadImageModelMap() {
         if(!mp3File.hasID3v2Tag()){
             ID3v24Tag tag = new ID3v24Tag();
             mp3File.setID3v2Tag(tag);
@@ -96,12 +71,18 @@ public class MP3Model {
             }
             if(tag.frameMap.containsKey("SYLT")){
                 if(tag.frameMap.get("SYLT") instanceof AbstractID3v2Frame){
-                    parseSYLTFrame((ID3v24Frame) tag.frameMap.get("SYLT"), apicFrameList);
-                } else if(tag.frameMap.get("SYLT") instanceof ArrayList){
-                    parseSYLTFrameList((ArrayList)tag.frameMap.get("SYLT"), apicFrameList);
+                    // parsing Timestamps if Sylt contentType == 8
+                    if(isCorrectContentType((ID3v24Frame) tag.frameMap.get("SYLT"))){
+                        parseSYLTFrame((ID3v24Frame) tag.frameMap.get("SYLT"), apicFrameList);
+                    }
                 }
+                tag.frameMap.remove("SYLT");
             }
         }
+    }
+
+    private boolean isCorrectContentType(ID3v24Frame frame) {
+        return ((FrameBodySYLT)frame.getBody()).getContentType() == 8;
     }
 
     private void parseSYLTFrame(ID3v24Frame syltFrame, ArrayList<ID3v24Frame> apicFrameList) {
@@ -113,7 +94,7 @@ public class MP3Model {
         String description = body.getDescription();
         byte textEncoding = body.getTextEncoding();
 
-        abstractContentModelMap = ByteExtractor.getAbstractContentModelMap(
+        imageModelMap = ByteExtractor.getAbstractContentModelMap(
                 data,
                 contentType,
                 timeStampFormat,
@@ -125,9 +106,4 @@ public class MP3Model {
 
     }
 
-    private void parseSYLTFrameList(ArrayList<ID3v24Frame> syltFrames, ArrayList<ID3v24Frame> apicFrameList) {
-        for(ID3v24Frame frame : syltFrames){
-            parseSYLTFrame(frame, apicFrameList);
-        }
-    }
 }

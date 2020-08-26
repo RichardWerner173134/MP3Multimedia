@@ -59,10 +59,6 @@ class MP3EnricherTest {
         mp3Model.addImage("testbild2.png", bi2, 51);
         mp3Model.addImage("testbild2.png", bi2, 61);
 
-        mp3Model.addSubtitle("Das ist Subtitel 1", 24);
-        mp3Model.addSubtitle("Das ist Subtitel 1", 33);
-        mp3Model.addSubtitle("Das ist ein anderer Subtitel", 28);
-
         MP3Enricher.attachAll(mp3Model);
 
         String s = StandardCharsets.ISO_8859_1.decode(ByteBuffer.wrap(
@@ -113,10 +109,6 @@ class MP3EnricherTest {
         mp3Model.addImage("testbild2.png", bi2, 41);
         mp3Model.addImage("testbild2.png", bi2, 51);
         mp3Model.addImage("testbild2.png", bi2, 61);
-
-        mp3Model.addSubtitle("Das ist Subtitel 1", 24);
-        mp3Model.addSubtitle("Das ist Subtitel 1", 33);
-        mp3Model.addSubtitle("Das ist ein anderer Subtitel", 28);
 
         MP3Enricher.attachAll(mp3Model);
 
