@@ -14,6 +14,8 @@ import org.jaudiotagger.tag.TagException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -21,7 +23,7 @@ public class EclipseCopyFrame extends JFrame {
 
     private JMenuBar        menuBar;
     private JMenu           jMenuFile;
-    private JMenuItem       jMenuFileItem1;
+    private JMenuItem       jMenuFileItemCloseMP3;
     private JMenuItem       jMenuFileItemSave;
     private JMenuItem       jMenuFileItem2;
     private JMenu           jMenu2;
@@ -45,7 +47,7 @@ public class EclipseCopyFrame extends JFrame {
     private JPanel          contentPane;
 
     private MP3Model mp3Model;
-    private ImageListModel imageListModel = new ImageListModel();
+    private ImageListModel imageListModel;
 
     private AudioPlayer player;
 
@@ -60,6 +62,7 @@ public class EclipseCopyFrame extends JFrame {
         setBounds(100, 100, 1280, 720);
 
         mp3Model = new MP3Model();
+        imageListModel = new ImageListModel();
 
         initComponents();
         initPanel();
@@ -73,7 +76,7 @@ public class EclipseCopyFrame extends JFrame {
 
         menuBar.add(jMenuFile);
 
-        jMenuFile.add(jMenuFileItem1);
+        jMenuFile.add(jMenuFileItemCloseMP3);
 
         jMenuFile.add(jMenuFileItemSave);
 
@@ -102,9 +105,11 @@ public class EclipseCopyFrame extends JFrame {
         scrollPaneImages.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jButtonRemovePicture.setBounds(203, 96, 131, 21);
+        jButtonRemovePicture.setEnabled(false);
         jPanelWest.add(jButtonRemovePicture);
 
         jButtonShowPicture.setBounds(203, 50, 131, 21);
+        jButtonShowPicture.setEnabled(false);
         jPanelWest.add(jButtonShowPicture);
 
         jLabelImagePreview.setBounds(10, 251, 168, 106);
@@ -226,18 +231,29 @@ public class EclipseCopyFrame extends JFrame {
                 }
             }
         });
+
+        // Reset UI
+        jMenuFileItemCloseMP3.addActionListener(e -> {
+            resetUI();
+        });
     }
 
 
     private void resetUI(){
-        this.imageListModel.setImageMap(null);
+        this.imageListModel.removeAllElements();
 
         this.player = null;
         this.jButtonPlayStop.setEnabled(false);
+        this.jButtonPlayStop.setText("Start");
         this.jButtonMp3Cursor.setEnabled(false);
+        this.jLabelMP3Name.setText("Keine MP3 geladen");
+        this.jLabelFrames.setText("");
+
+        this.jLabelPreviewText.setText("Bildvorschau");
+        this.jLabelImagePreview = null;
 
         this.mp3Model = null;
-        this.jProgressBarMP3Bar.setBackground(Color.gray);
+        this.jProgressBarMP3Bar.setBackground(null);
     }
 
     private void initComponents() {
@@ -246,8 +262,8 @@ public class EclipseCopyFrame extends JFrame {
 
             // Menu File
             jMenuFile = new JMenu("File");
-                jMenuFileItem1 = new JMenuItem("New menu item");
                 jMenuFileItem2 = new JMenuItem("New menu item");
+                jMenuFileItemCloseMP3 = new JMenuItem("Close MP3");
                 jMenuFileItemSave = new JMenuItem("Save");
             jMenu2 = new JMenu("New menu");
 
