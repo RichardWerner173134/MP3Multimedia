@@ -82,7 +82,7 @@ public class ByteExtractor {
             }
 
             model.getTimestampMap().put(
-                    String.valueOf(model.getTimestampMap().size()),
+                    String.valueOf(timeStampNumber),
                     new ContentTimeStamp(timeStampNumber));
 
             imageModelMap.put(contentWithoutTimeStamp, model);

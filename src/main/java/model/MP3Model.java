@@ -34,7 +34,7 @@ public class MP3Model {
                 if(!containsIdenticalTimestamp){
                     imageModelMap.get(filename)
                             .getTimestampMap()
-                            .put(String.valueOf(imageModelMap.get(filename).getTimestampMap().size()),
+                            .put(String.valueOf(starttime),
                                     new ContentTimeStamp(starttime));
                     imageModelMap.get(filename).setBufferedImage(bufferedImage);
                 }
@@ -43,7 +43,7 @@ public class MP3Model {
             imageModelMap.put(filename, new ImageModel());
             imageModelMap.get(filename)
                     .getTimestampMap()
-                    .put(String.valueOf(imageModelMap.get(filename).getTimestampMap().size()),
+                    .put(String.valueOf(starttime),
                             new ContentTimeStamp(starttime));
             imageModelMap.get(filename).setBufferedImage(bufferedImage);
         }
