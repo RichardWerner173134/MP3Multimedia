@@ -150,7 +150,11 @@ public class MP3Enricher {
 
             // SYLT Frame Bytes generieren bauen
             try {
-                baos.write(StandardCharsets.ISO_8859_1.encode("\n" + e.key).array());
+                if(baos.toByteArray().length == 0){
+                    baos.write(StandardCharsets.ISO_8859_1.encode(e.key).array());
+                } else{
+                    baos.write(StandardCharsets.ISO_8859_1.encode("\n" + e.key).array());
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

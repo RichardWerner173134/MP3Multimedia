@@ -71,7 +71,7 @@ public class ByteExtractor {
 
         HashMap<String, ImageModel> imageModelMap = new HashMap<>();
         ImageModel model;
-        for(int i = 1; i < splitted.length; i++){
+        for(int i = 0; i < splitted.length; i++){
             int timeStampNumber = getTimeStampNumber(splitted[i]);
             String contentWithoutTimeStamp = getContentWithoutTimeStamp(splitted[i]);
 
