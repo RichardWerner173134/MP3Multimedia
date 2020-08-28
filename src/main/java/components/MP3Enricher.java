@@ -1,5 +1,6 @@
 package components;
 
+import lombok.Getter;
 import model.*;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
@@ -150,7 +151,11 @@ public class MP3Enricher {
 
             // SYLT Frame Bytes generieren bauen
             try {
-                baos.write(StandardCharsets.ISO_8859_1.encode("\n" + e.key).array());
+                if(baos.toByteArray().length == 0){
+                    baos.write(StandardCharsets.ISO_8859_1.encode(e.key).array());
+                } else{
+                    baos.write(StandardCharsets.ISO_8859_1.encode("\n" + e.key).array());
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -208,11 +213,12 @@ public class MP3Enricher {
         return ByteBuffer.allocate(4).putInt(starttime).array();
     }
 
-    static class Entry {
+    @Getter
+    public static class Entry {
         private String key;
         private int timestamp;
 
-        Entry(String key, int timestamp){
+        public Entry(String key, int timestamp){
             this.key = key;
             this.timestamp = timestamp;
         }
