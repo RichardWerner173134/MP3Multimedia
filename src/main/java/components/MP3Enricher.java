@@ -1,5 +1,6 @@
 package components;
 
+import lombok.Getter;
 import model.*;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
@@ -212,11 +213,12 @@ public class MP3Enricher {
         return ByteBuffer.allocate(4).putInt(starttime).array();
     }
 
-    static class Entry {
+    @Getter
+    public static class Entry {
         private String key;
         private int timestamp;
 
-        Entry(String key, int timestamp){
+        public Entry(String key, int timestamp){
             this.key = key;
             this.timestamp = timestamp;
         }

@@ -73,9 +73,9 @@ class MP3EnricherTest {
         modelWrite.addImage("testbild1.png", bi, 15000);
         modelWrite.addImage("testbild1.png", bi, 25000);
         modelWrite.addImage("testbild1.png", bi, 5000);
-        modelWrite.addImage("testbild2.png", bi, 10000);
-        modelWrite.addImage("testbild2.png", bi, 20000);
-        modelWrite.addImage("testbild2.png", bi, 0);
+        modelWrite.addImage("testbild2.png", bi2, 10000);
+        modelWrite.addImage("testbild2.png", bi2, 20000);
+        modelWrite.addImage("testbild2.png", bi2, 0);
 
         MP3Enricher.attachAll(modelWrite);
 
