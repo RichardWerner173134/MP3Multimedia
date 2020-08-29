@@ -2,12 +2,16 @@ package components;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+@Setter
+@Getter
 public class AudioPlayer{
    private FileInputStream fis;
    private BufferedInputStream bis;
@@ -26,24 +30,30 @@ public class AudioPlayer{
        }
    }
 
-   public void play(String path){
+   public void play(){
        new Thread(() -> {
            try {
+
                player.play();
            } catch (JavaLayerException e) {
                e.printStackTrace();
            }
        }).start();
-
-       timerThread = new Thread(() -> {
-           ;
-       });
-        timerThread.start();
    }
 
    public void stop(){
        player.close();
    }
 
+   public void setFile(String path){
+       try {
+           fis = new FileInputStream(path);
+           bis = new BufferedInputStream(fis);
+           player = new Player(bis);
+           songLength = fis.available();
+       } catch (JavaLayerException | IOException e) {
+           e.printStackTrace();
+       }
+   }
 
 }

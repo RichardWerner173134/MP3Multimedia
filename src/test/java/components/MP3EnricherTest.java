@@ -1,6 +1,5 @@
 package components;
 
-import lombok.Getter;
 import model.ContentTimeStamp;
 import model.ImageModel;
 import model.MP3Model;
@@ -8,18 +7,13 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.ID3v24Frame;
-import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -27,7 +21,7 @@ import java.util.*;
 import static org.mockito.Matchers.any;
 
 class MP3EnricherTest {
-    private String src = "C:/Users/Richard/Desktop/src.mp3";
+    private String src = "C:/Users/Richard/Desktop/kopie.mp3";
     private String dest = "C:/Users/Richard/Desktop/dest.mp3";
 
     public void createTestFile(){
@@ -54,7 +48,7 @@ class MP3EnricherTest {
         } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
             e.printStackTrace();
         }
-        modelWrite.setMp3File(mp3File);
+        modelWrite.setMp3FileAndLoad(mp3File);
 
         BufferedImage bi = null;
         try {
@@ -78,6 +72,11 @@ class MP3EnricherTest {
         modelWrite.addImage("testbild2.png", bi2, 0);
 
         MP3Enricher.attachAll(modelWrite);
+        try {
+            modelWrite.getMp3File().save();
+        } catch (IOException | TagException e) {
+            e.printStackTrace();
+        }
 
         MP3Model modelRead = new MP3Model();
         MP3File testCompareFile = null;
@@ -86,7 +85,7 @@ class MP3EnricherTest {
         } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
             e.printStackTrace();
         }
-        modelRead.setMp3File(testCompareFile);
+        modelRead.setMp3FileAndLoad(testCompareFile);
 
         HashMap<String, ImageModel> imageModelMap1 = modelWrite.getImageModelMap();
         modelWrite.getImageModelMap().entrySet().stream()
@@ -101,7 +100,6 @@ class MP3EnricherTest {
 
 
     private boolean isImageModelMapEualsTo(HashMap<String, ImageModel> modelWrite,HashMap<String, ImageModel> modelRead){
-        int i = 0;
         /**
          * model1: alle timestamps für bild1 raussuchen
          * für jeden timestamp schauen, ob bei model2 der starttimewert übereinstimmt
@@ -145,6 +143,40 @@ class MP3EnricherTest {
             sortedHashMap.put(entry.getKey(), entry.getValue());
         }
         return sortedHashMap;
+    }
+
+    @Test
+    public void testSave(){
+        MP3File mp3File = null;
+        try {
+            mp3File = new MP3File("C:/Users/Richard/Desktop/dest.mp3");
+        } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            mp3File.save();
+        } catch (IOException | TagException e) {
+            e.printStackTrace();
+        }
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void testRenameTo(){
+        MP3File file = null;
+        try {
+            file = new MP3File(new File("C:/Users/Richard/Documents/A/test.mp3"));
+        } catch (IOException | InvalidAudioFrameException | TagException | ReadOnlyFileException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            file.save();
+        } catch (IOException | TagException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
