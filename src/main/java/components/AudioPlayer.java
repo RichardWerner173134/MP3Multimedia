@@ -16,44 +16,65 @@ public class AudioPlayer{
    private FileInputStream fis;
    private BufferedInputStream bis;
    private Player player;
-   private Thread timerThread;
-   private int songLength;
+   private long pauseLocation;
+   private long songTotalLength;
+   private String fileLocation;
 
    public AudioPlayer(String path){
-       try {
-           fis = new FileInputStream(path);
-           bis = new BufferedInputStream(fis);
-           player = new Player(bis);
-           songLength = fis.available();
-       } catch (JavaLayerException | IOException e) {
-           e.printStackTrace();
-       }
+       fileLocation = path + "";
    }
 
    public void play(){
        new Thread(() -> {
            try {
-
+               fis = new FileInputStream(fileLocation);
+               bis = new BufferedInputStream(fis);
+               player = new Player(bis);
+               songTotalLength = fis.available();
                player.play();
-           } catch (JavaLayerException e) {
+           } catch (JavaLayerException | IOException e) {
                e.printStackTrace();
            }
        }).start();
    }
 
+   public void pause(){
+       if(player != null){
+           try {
+               pauseLocation = fis.available();
+               player.close();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       }
+   }
+
    public void stop(){
+       pauseLocation = 0;
        player.close();
    }
 
+   public void resume(){
+        new Thread(() -> {
+            try {
+                fis = new FileInputStream(fileLocation);
+                bis = new BufferedInputStream(fis);
+                player = new Player(bis);
+                songTotalLength = fis.available();
+
+                if(pauseLocation != 0){
+                    fis.skip(songTotalLength - pauseLocation);
+                }
+
+                player.play();
+            } catch (JavaLayerException | IOException e){
+                e.printStackTrace();
+            }
+        }).start();
+   }
+
    public void setFile(String path){
-       try {
-           fis = new FileInputStream(path);
-           bis = new BufferedInputStream(fis);
-           player = new Player(bis);
-           songLength = fis.available();
-       } catch (JavaLayerException | IOException e) {
-           e.printStackTrace();
-       }
+       this.fileLocation = path;
    }
 
 }

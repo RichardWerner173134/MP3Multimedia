@@ -17,15 +17,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 public class EclipseCopyFrame extends JFrame {
 
     private JMenuBar        menuBar;
     private JMenu           jMenuFile;
-    private JMenuItem       jMenuFileItemCloseMP3;
+    private JMenuItem       jMenuResetWorkspace;
     private JMenuItem       jMenuFileItemSave;
     private JMenuItem       jMenuFileItem2;
     private JMenu           jMenu2;
@@ -40,7 +37,8 @@ public class EclipseCopyFrame extends JFrame {
     private JPanel          jPanelEast;
     private JLabel          jLabelMP3Name;
     private JProgressBar    jProgressBarMP3Bar;
-    private JButton         jButtonPlayStop;
+    private JButton         jButtonPlayPause;
+    private JButton         jButtonReset;
     private JButton         jButtonAddMP3;
     private JLabel          jLabelFrames;
     private JList           imageList;
@@ -48,8 +46,8 @@ public class EclipseCopyFrame extends JFrame {
     private JButton         jButtonMp3Cursor;
     private JPanel          contentPane;
 
-    private MP3Model mp3Model;
-    private ImageListModel imageListModel;
+    private MP3Model        mp3Model;
+    private ImageListModel  imageListModel;
 
     private AudioPlayer player;
 
@@ -78,7 +76,7 @@ public class EclipseCopyFrame extends JFrame {
 
         menuBar.add(jMenuFile);
 
-        jMenuFile.add(jMenuFileItemCloseMP3);
+        jMenuFile.add(jMenuResetWorkspace);
 
         jMenuFile.add(jMenuFileItemSave);
 
@@ -131,12 +129,16 @@ public class EclipseCopyFrame extends JFrame {
 
         jProgressBarMP3Bar.setEnabled(true);
         jProgressBarMP3Bar.setValue(0);
-        jProgressBarMP3Bar.setBounds(12, 122, 635, 32);
+        jProgressBarMP3Bar.setBounds(48, 160, 635, 32);
         jPanelEast.add(jProgressBarMP3Bar);
 
-        jButtonPlayStop.setBounds(266, 166, 104, 21);
-        jButtonPlayStop.setEnabled(false);
-        jPanelEast.add(jButtonPlayStop);
+        jButtonPlayPause.setBounds(48, 129, 85, 21);
+        jButtonPlayPause.setEnabled(false);
+        jPanelEast.add(jButtonPlayPause);
+
+        jButtonReset.setBounds(143, 129, 85, 21);
+        jButtonReset.setEnabled(false);
+        jPanelEast.add(jButtonReset);
 
         jButtonAddMP3.setBounds(10, 10, 104, 21);
         jPanelEast.add(jButtonAddMP3);
@@ -150,6 +152,7 @@ public class EclipseCopyFrame extends JFrame {
         jButtonMp3Cursor.setBounds(12, 121, 8, 32);
         jPanelEast.add(jButtonMp3Cursor);
         jButtonMp3Cursor.setEnabled(false);
+        jButtonMp3Cursor.setVisible(false);
         jButtonMp3Cursor.setForeground(Color.BLACK);
     }
 
@@ -171,7 +174,7 @@ public class EclipseCopyFrame extends JFrame {
                 jButtonMp3Cursor.setEnabled(true);
 
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
-                jButtonPlayStop.setEnabled(true);
+                jButtonPlayPause.setEnabled(true);
             }
         });
 
@@ -231,23 +234,31 @@ public class EclipseCopyFrame extends JFrame {
             }
         });
 
-        // start/stop player
-        jButtonPlayStop.addActionListener(e -> {
+        // start/pause player
+        jButtonPlayPause.addActionListener(e -> {
             if (player == null) {
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
                 player.setFile(mp3Model.getMp3File().getFile().getAbsolutePath());
             }
-            if(jButtonPlayStop.getText().equals("Start")){
-                player.play();
-                jButtonPlayStop.setText("Stop");
-            } else if(jButtonPlayStop.getText().equals("Stop")){
-                player.stop();
-                jButtonPlayStop.setText("Start");
+            jButtonReset.setEnabled(true);
+            if(jButtonPlayPause.getText().equals("Start")){
+                player.resume();
+                jButtonPlayPause.setText("Pause");
+            } else if(jButtonPlayPause.getText().equals("Pause")){
+                player.pause();
+                jButtonPlayPause.setText("Start");
             }
         });
 
+        // reset/ Stop player
+        jButtonReset.addActionListener(e -> {
+            player.stop();
+            jButtonPlayPause.setText("Start");
+            jButtonReset.setEnabled(false);
+        });
+
         // Reset UI
-        jMenuFileItemCloseMP3.addActionListener(e -> {
+        jMenuResetWorkspace.addActionListener(e -> {
             resetUI();
         });
     }
@@ -258,16 +269,17 @@ public class EclipseCopyFrame extends JFrame {
         this.imageListModel.removeAllElements();
 
         this.player = null;
-        this.jButtonPlayStop.setEnabled(false);
-        this.jButtonPlayStop.setText("Start");
+        this.jButtonPlayPause.setEnabled(false);
+        this.jButtonPlayPause.setText("Start");
+        this.jButtonReset.setEnabled(false);
         this.jButtonMp3Cursor.setEnabled(false);
         this.jLabelMP3Name.setText("Keine MP3 geladen");
         this.jLabelFrames.setText("");
 
         this.jLabelPreviewText.setText("Bildvorschau");
-        this.jLabelImagePreview = null;
+        this.jLabelImagePreview.setIcon(null);
 
-        this.mp3Model = null;
+        this.mp3Model = new MP3Model();
         this.jProgressBarMP3Bar.setBackground(null);
     }
 
@@ -278,7 +290,7 @@ public class EclipseCopyFrame extends JFrame {
             // Menu File
             jMenuFile = new JMenu("File");
                 jMenuFileItem2 = new JMenuItem("New menu item");
-                jMenuFileItemCloseMP3 = new JMenuItem("Close MP3");
+                jMenuResetWorkspace = new JMenuItem("Reset Workspace");
                 jMenuFileItemSave = new JMenuItem("Save");
             jMenu2 = new JMenu("New menu");
 
@@ -309,8 +321,8 @@ public class EclipseCopyFrame extends JFrame {
             jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
             jProgressBarMP3Bar = new JProgressBar();
             jButtonMp3Cursor = new JButton("");
-            jButtonPlayStop = new JButton("Start");
-
+            jButtonPlayPause = new JButton("Start");
+            jButtonReset = new JButton("Stop");
         // displaying Frames, for testing purposes
         jLabelFrames = new JLabel("");
     }
