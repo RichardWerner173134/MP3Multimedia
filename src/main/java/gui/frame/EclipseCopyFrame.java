@@ -14,10 +14,12 @@ import org.jaudiotagger.tag.TagException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class EclipseCopyFrame extends JFrame {
 
@@ -163,13 +165,12 @@ public class EclipseCopyFrame extends JFrame {
                 } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotReadException ex) {
                     ex.printStackTrace();
                 }
-                jLabelFrames.setText(MP3Enricher.getMP3Info(mp3File));
-                mp3Model.setMp3File(mp3File);
+                mp3Model.setMp3FileAndLoad(mp3File);
                 jLabelMP3Name.setText(mp3File.getFile().getAbsolutePath());
                 jProgressBarMP3Bar.setBackground(Color.YELLOW);
                 jButtonMp3Cursor.setEnabled(true);
 
-                player = new AudioPlayer(mp3File.getFile().getAbsolutePath());
+                player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
                 jButtonPlayStop.setEnabled(true);
             }
         });
@@ -215,20 +216,33 @@ public class EclipseCopyFrame extends JFrame {
 
         // Save MP3
         jMenuFileItemSave.addActionListener(e -> {
-            MP3Enricher.attachAll(mp3Model);
-            jLabelFrames.setText(MP3Enricher.getMP3Info(mp3Model.getMp3File()));
+            // TODO save player time
+            player.stop();
+            player = null;
+            JFileChooser fileChooser = new JFileChooser();
+            int returnVal = fileChooser.showOpenDialog(contentPane);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File saveFile = fileChooser.getSelectedFile();
+                if(saveFile != null){
+                    if(!MP3Enricher.customSave(saveFile, mp3Model)){
+                        throw new RuntimeException("Couldnt save File");
+                    }
+                }
+            }
         });
 
         // start/stop player
         jButtonPlayStop.addActionListener(e -> {
-            if(player != null){
-                if(jButtonPlayStop.getText().equals("Start")){
-                    player.play(mp3Model.getMp3File().getFile().getAbsolutePath());
-                    jButtonPlayStop.setText("Stop");
-                } else if(jButtonPlayStop.getText().equals("Stop")){
-                    player.stop();
-                    jButtonPlayStop.setText("Start");
-                }
+            if (player == null) {
+                player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
+                player.setFile(mp3Model.getMp3File().getFile().getAbsolutePath());
+            }
+            if(jButtonPlayStop.getText().equals("Start")){
+                player.play();
+                jButtonPlayStop.setText("Stop");
+            } else if(jButtonPlayStop.getText().equals("Stop")){
+                player.stop();
+                jButtonPlayStop.setText("Start");
             }
         });
 
@@ -237,6 +251,7 @@ public class EclipseCopyFrame extends JFrame {
             resetUI();
         });
     }
+
 
 
     private void resetUI(){

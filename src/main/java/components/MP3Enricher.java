@@ -1,27 +1,38 @@
 package components;
 
 import lombok.Getter;
-import model.*;
+import model.ContentTimeStamp;
+import model.ImageModel;
+import model.MP3Model;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
+import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
+import util.IOUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+
+import static util.IOUtil.renameFile;
 
 public class MP3Enricher {
 
     private static void addSYLTFrame(MP3File mp3File, byte [] bytes) {
-        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
+        AbstractID3v2Tag tag = (AbstractID3v2Tag) mp3File.getID3v2Tag();
         ID3v24Frame frame = null;
 
         if(tag.frameMap.containsKey("SYLT")){
@@ -49,7 +60,7 @@ public class MP3Enricher {
     }
 
     public static void addAPICFrame(MP3File mp3File, AbstractID3v2Frame frame){
-        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
+        AbstractID3v2Tag tag = (AbstractID3v2Tag) mp3File.getID3v2Tag();
 
         if(!tag.frameMap.containsKey("APIC")){
             tag.frameMap.put("APIC", new ArrayList<>());
@@ -77,36 +88,6 @@ public class MP3Enricher {
         return frame;
     }
 
-    public static String getMP3Info(MP3File mp3File) {
-        String info = "";
-        ArrayList<AbstractID3v2Frame> frames = new ArrayList<>();
-
-        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
-
-        for (Object o1 : tag.frameMap.keySet())
-        {
-            String id = (String) o1;
-            Object o = tag.frameMap.get(id);
-            //SingleFrames
-            if (o instanceof AbstractID3v2Frame)
-            {
-                frames.add((AbstractID3v2Frame) o);
-            }
-            //MultiFrames
-            else if (o instanceof ArrayList)
-            {
-                frames.addAll((ArrayList<AbstractID3v2Frame>) o);
-            }
-        }
-
-        info += "<html><body> Frames der Datei " + mp3File.getFile().getName() + "<br>";
-        for(AbstractID3v2Frame frame : frames){
-            info += frame.getIdentifier() + ", " + frame.getBody().getSize() + "<br>";
-        }
-        info += "</body></html>";
-
-        return info;
-    }
     public static void attachAll(MP3Model mp3Model) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
@@ -172,24 +153,19 @@ public class MP3Enricher {
         }
 
         // add SYLT Frame
-        addSYLTFrame(mp3Model.getMp3File(), baos.toByteArray());
-
-        saveFile(mp3Model.getMp3File());
-
-
-    }
-
-    public static int saveFile(MP3File mp3File) {
-        try {
-            mp3File.save();
-        } catch (IOException | TagException e) {
-            e.printStackTrace();
+        if(!(baos.size() == 0)){
+            addSYLTFrame(mp3Model.getMp3File(), baos.toByteArray());
         }
-        return 0;
+
+        try {
+            mp3Model.getMp3File().save();
+        } catch (IOException | TagException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static boolean isImageAttached(MP3File mp3File, String key) {
-        ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
+        ID3v24Tag tag = mp3File.getID3v2TagAsv24();
         if(tag.frameMap.containsKey("APIC")){
             if(tag.frameMap.get("APIC") instanceof ArrayList){
                 for(ID3v24Frame f : (ArrayList<ID3v24Frame>)tag.frameMap.get("APIC")){
@@ -211,6 +187,49 @@ public class MP3Enricher {
 
     private static byte[] calcTimestampBytes(int starttime) {
         return ByteBuffer.allocate(4).putInt(starttime).array();
+    }
+
+
+    public static boolean customSave(File saveDestinationFile, MP3Model mp3Model) {
+        // save for later
+        MP3File editedMP3 = mp3Model.getMp3File();
+
+        // in jedem Fall: kopie erstellen, kopie befüllen, kopie speichern
+
+        // 1 Kopie erstellen
+        File uneditedCopyFile = IOUtil.createCopy(saveDestinationFile);
+        try {
+            Files.copy(editedMP3.getFile().toPath(), uneditedCopyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 2 kopie befüllen
+        MP3File copiedMP3 = null;
+        try {
+            copiedMP3 = new MP3File(uneditedCopyFile);
+        } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+            e.printStackTrace();
+        }
+
+        // 3 kopie speichern
+        mp3Model.setMP3WithoutLoad(copiedMP3);
+        MP3Enricher.attachAll(mp3Model);
+
+        // saveDestinationFile == originale mp3: original umbenennen, kopie umbenennen, original löschen
+        if(saveDestinationFile.getAbsolutePath().equals(editedMP3.getFile().getAbsolutePath())){
+            renameFile(editedMP3, copiedMP3);
+            MP3File reloadedFile = null;
+            try {
+                reloadedFile = new MP3File(saveDestinationFile);
+            } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+                e.printStackTrace();
+            }
+            mp3Model.setMP3WithoutLoad(reloadedFile);
+            return true;
+        } else {
+            return true;
+        }
     }
 
     @Getter

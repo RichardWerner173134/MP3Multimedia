@@ -2,14 +2,22 @@ package model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
+import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import util.ByteExtractor;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -50,9 +58,13 @@ public class MP3Model {
 
     }
 
-    public void setMp3File(MP3File mp3File){
+    public void setMp3FileAndLoad(MP3File mp3File){
         this.mp3File = mp3File;
         loadImageModelMap();
+    }
+
+    public void setMP3WithoutLoad(MP3File mp3File){
+        this.mp3File = mp3File;
     }
 
     private void loadImageModelMap() {
@@ -60,7 +72,7 @@ public class MP3Model {
             ID3v24Tag tag = new ID3v24Tag();
             mp3File.setID3v2Tag(tag);
         } else {
-            ID3v24Tag tag = (ID3v24Tag) mp3File.getID3v2Tag();
+            ID3v24Tag tag = mp3File.getID3v2TagAsv24();
             ArrayList<ID3v24Frame> apicFrameList = new ArrayList<>();
             if(tag.frameMap.containsKey("APIC")){
                 if(tag.frameMap.get("APIC") instanceof ArrayList){
