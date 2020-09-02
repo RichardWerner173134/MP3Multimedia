@@ -33,20 +33,22 @@ public class AudioPlayer{
         player = new Player(bis);
     }
 
-    public void pause(){
+    public void pause(PlayerBar playerBar){
        if(player != null){
            try {
                pauseLocation = songTotalLength - fis.available();
                player.close();
+               playerBar.stopDrawing();
            } catch (IOException e) {
                e.printStackTrace();
            }
        }
    }
 
-   public void stop(){
+   public void stop(PlayerBar playerBar){
        player.close();
        pauseLocation = 0;
+       playerBar.stopDrawing();
    }
 
    public void resume(PlayerBar playerBar, MP3File mp3file){

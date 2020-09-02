@@ -211,9 +211,8 @@ public class EditorFrame extends JFrame {
 
         // Save MP3
         jMenuFileItemSave.addActionListener(e -> {
-            // TODO save player time
             if(player != null){
-                player.pause();
+                player.pause(playerBar);
             }
             JFileChooser fileChooser = new JFileChooser();
             int returnVal = fileChooser.showOpenDialog(contentPane);
@@ -237,7 +236,7 @@ public class EditorFrame extends JFrame {
                 jPanelEast.revalidate();
                 jButtonPlayPause.setText("Pause");
             } else if(jButtonPlayPause.getText().equals("Pause")){
-                player.pause();
+                player.pause(playerBar);
                 jButtonPlayPause.setText("Start");
             }
         });
@@ -245,7 +244,7 @@ public class EditorFrame extends JFrame {
         // reset/ Stop player
         jButtonReset.addActionListener(e -> {
             if(player != null){
-                player.stop();
+                player.stop(playerBar);
             }
             jButtonPlayPause.setText("Start");
             jButtonReset.setEnabled(false);
