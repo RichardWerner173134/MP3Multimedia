@@ -2,6 +2,8 @@ package gui.frame;
 
 import components.AudioPlayer;
 import components.MP3Enricher;
+import lombok.Getter;
+import lombok.Setter;
 import model.ImageListModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -20,7 +22,7 @@ import java.io.IOException;
 
 public class EditorFrame extends JFrame {
 
-    private JMenuBar        menuBar;
+    private JMenuBar        jMenuBar;
     private JMenu           jMenuFile;
     private JMenuItem       jMenuResetWorkspace;
     private JMenuItem       jMenuFileItemSave;
@@ -36,14 +38,13 @@ public class EditorFrame extends JFrame {
     private JLabel          jLabelPreviewText;
     private JPanel          jPanelEast;
     private JLabel          jLabelMP3Name;
-    private JProgressBar    jProgressBarMP3Bar;
+    private PlayerBar       playerBar;
     private JButton         jButtonPlayPause;
     private JButton         jButtonReset;
     private JButton         jButtonAddMP3;
     private JLabel          jLabelFrames;
     private JList           imageList;
     private JButton         jButtonAttachPicture;
-    private JButton         jButtonMp3Cursor;
     private JPanel          contentPane;
 
     private MP3Model        mp3Model;
@@ -72,15 +73,15 @@ public class EditorFrame extends JFrame {
 
 
     private void initPanel() {
-        setJMenuBar(menuBar);
+        setJMenuBar(jMenuBar);
 
-        menuBar.add(jMenuFile);
+        jMenuBar.add(jMenuFile);
 
         jMenuFile.add(jMenuResetWorkspace);
 
         jMenuFile.add(jMenuFileItemSave);
 
-        menuBar.add(jMenu2);
+        jMenuBar.add(jMenu2);
 
         jMenu2.add(jMenuFileItem2);
         contentPane = new JPanel();
@@ -127,10 +128,8 @@ public class EditorFrame extends JFrame {
         jLabelMP3Name.setBackground(Color.BLACK);
         jPanelEast.add(jLabelMP3Name);
 
-        jProgressBarMP3Bar.setEnabled(true);
-        jProgressBarMP3Bar.setValue(0);
-        jProgressBarMP3Bar.setBounds(48, 160, 635, 32);
-        jPanelEast.add(jProgressBarMP3Bar);
+        playerBar.setBounds(48, 160, 635, 32);
+        jPanelEast.add(playerBar);
 
         jButtonPlayPause.setBounds(48, 129, 85, 21);
         jButtonPlayPause.setEnabled(false);
@@ -148,12 +147,6 @@ public class EditorFrame extends JFrame {
 
         jButtonAttachPicture.setBounds(126, 10, 104, 21);
         jPanelEast.add(jButtonAttachPicture);
-
-        jButtonMp3Cursor.setBounds(12, 121, 8, 32);
-        jPanelEast.add(jButtonMp3Cursor);
-        jButtonMp3Cursor.setEnabled(false);
-        jButtonMp3Cursor.setVisible(false);
-        jButtonMp3Cursor.setForeground(Color.BLACK);
     }
 
     private void addActionListeners() {
@@ -170,8 +163,7 @@ public class EditorFrame extends JFrame {
                 }
                 mp3Model.setMp3FileAndLoad(mp3File);
                 jLabelMP3Name.setText(mp3File.getFile().getAbsolutePath());
-                jProgressBarMP3Bar.setBackground(Color.YELLOW);
-                jButtonMp3Cursor.setEnabled(true);
+                playerBar.displayMP3();
 
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
                 jButtonPlayPause.setEnabled(true);
@@ -237,11 +229,12 @@ public class EditorFrame extends JFrame {
         jButtonPlayPause.addActionListener(e -> {
             if (player == null) {
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
-                player.setFile(mp3Model.getMp3File().getFile().getAbsolutePath());
+                player.setPath(mp3Model.getMp3File().getFile().getAbsolutePath());
             }
             jButtonReset.setEnabled(true);
             if(jButtonPlayPause.getText().equals("Start")){
-                player.resume();
+                player.resume(playerBar, mp3Model.getMp3File());
+                jPanelEast.revalidate();
                 jButtonPlayPause.setText("Pause");
             } else if(jButtonPlayPause.getText().equals("Pause")){
                 player.pause();
@@ -252,7 +245,6 @@ public class EditorFrame extends JFrame {
         // reset/ Stop player
         jButtonReset.addActionListener(e -> {
             if(player != null){
-                player.pause();
                 player.stop();
             }
             jButtonPlayPause.setText("Start");
@@ -274,7 +266,6 @@ public class EditorFrame extends JFrame {
         this.jButtonPlayPause.setEnabled(false);
         this.jButtonPlayPause.setText("Start");
         this.jButtonReset.setEnabled(false);
-        this.jButtonMp3Cursor.setEnabled(false);
         this.jLabelMP3Name.setText("Keine MP3 geladen");
         this.jLabelFrames.setText("");
 
@@ -282,12 +273,12 @@ public class EditorFrame extends JFrame {
         this.jLabelImagePreview.setIcon(null);
 
         this.mp3Model = new MP3Model();
-        this.jProgressBarMP3Bar.setBackground(null);
+        this.playerBar.displayNothing();
     }
 
     private void initComponents() {
         //Menu
-        menuBar = new JMenuBar();
+        jMenuBar = new JMenuBar();
 
             // Menu File
             jMenuFile = new JMenu("File");
@@ -321,8 +312,7 @@ public class EditorFrame extends JFrame {
 
             // Player
             jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
-            jProgressBarMP3Bar = new JProgressBar();
-            jButtonMp3Cursor = new JButton("");
+            playerBar = new PlayerBar();
             jButtonPlayPause = new JButton("Start");
             jButtonReset = new JButton("Stop");
         // displaying Frames, for testing purposes
