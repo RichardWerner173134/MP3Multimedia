@@ -36,7 +36,7 @@ public class AudioPlayer{
     public void pause(PlayerBar playerBar){
        if(player != null){
            try {
-               pauseLocation = songTotalLength - fis.available();
+               pauseLocation = songTotalLength - fis.available() - 10000;
                player.close();
                playerBar.stopDrawing();
            } catch (IOException e) {

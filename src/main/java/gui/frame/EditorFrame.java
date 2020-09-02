@@ -2,8 +2,6 @@ package gui.frame;
 
 import components.AudioPlayer;
 import components.MP3Enricher;
-import lombok.Getter;
-import lombok.Setter;
 import model.ImageListModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -12,13 +10,19 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
+import util.Other;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class EditorFrame extends JFrame {
 
@@ -46,12 +50,12 @@ public class EditorFrame extends JFrame {
     private JList           imageList;
     private JButton         jButtonAttachPicture;
     private JPanel          contentPane;
-
+    private JPanel          jPanelAttachedPictures;
     private MP3Model        mp3Model;
     private ImageListModel  imageListModel;
 
     private AudioPlayer player;
-
+    private HashMap<String, AttachedImage> attachedPictures;
 
     /**
      * Create the frame.
@@ -64,6 +68,7 @@ public class EditorFrame extends JFrame {
 
         mp3Model = new MP3Model();
         imageListModel = new ImageListModel();
+        attachedPictures = new HashMap<>();
 
         initComponents();
         initPanel();
@@ -147,6 +152,10 @@ public class EditorFrame extends JFrame {
 
         jButtonAttachPicture.setBounds(126, 10, 104, 21);
         jPanelEast.add(jButtonAttachPicture);
+
+        jPanelAttachedPictures.setBounds(playerBar.getX(), playerBar.getY() + 50, playerBar.getWidth(), 50);
+        jPanelAttachedPictures.setLayout(null);
+        jPanelEast.add(jPanelAttachedPictures);
     }
 
     private void addActionListeners() {
@@ -202,8 +211,16 @@ public class EditorFrame extends JFrame {
             String selectedValue = (String) imageList.getSelectedValue();
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
-                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi);
+                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi, attachedPictures);
                 dialogView.setEnabled(true);
+                dialogView.setAlwaysOnTop(true);
+                dialogView.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        repaint();
+                    }
+                });
             }
 
 
@@ -256,7 +273,50 @@ public class EditorFrame extends JFrame {
         });
     }
 
+    @Override
+    public void paint(Graphics g){
 
+        if(attachedPictures.size() == 0){
+            super.paint(g);
+            return;
+        }
+
+        int totalWidth = jPanelAttachedPictures.getWidth();
+
+        double tracklengthMillis = mp3Model.getMp3File().getAudioHeader().getTrackLength() * 1000;
+
+        // Iterate through Collection of all AttachedImages
+        Iterator it = attachedPictures.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            AttachedImage attachedImage = (AttachedImage) entry.getValue();
+
+            // recalculate Stoptime based on least bigger starttime
+            attachedImage.setStoptime(
+                    AttachedImage.getStopTimeForAttachedImage(String.valueOf(entry.getKey()),
+                            attachedPictures,
+                            (int) tracklengthMillis));
+
+            // calculate Coordinates and add to Panel
+            double percentageStart = ((double) attachedImage.getStarttimeMillis()) / tracklengthMillis;
+            double percentageStop = ((double) attachedImage.getStoptime()) / tracklengthMillis;
+
+            int x1 = (int) (totalWidth * (percentageStart));
+            int y1 = 0;
+            int x2 = (int) (totalWidth * (percentageStop));
+            int y2 = 20;
+            int imgWidth = x2 - x1;
+            int imgHeight = y2 - y1;
+
+            attachedImage.setBackground(Color.yellow);
+            attachedImage.setBounds(x1, y1, imgWidth, imgHeight);
+            attachedImage.setVisible(true);
+            attachedImage.setToolTipText(Other.getToolTipTextForJButton(attachedImage));
+            jPanelAttachedPictures.add(attachedImage);
+        }
+        jPanelAttachedPictures.revalidate();
+        super.paint(g);
+    }
 
     private void resetUI(){
         this.imageListModel.removeAllElements();
@@ -279,41 +339,42 @@ public class EditorFrame extends JFrame {
         //Menu
         jMenuBar = new JMenuBar();
 
-            // Menu File
-            jMenuFile = new JMenu("File");
-                jMenuFileItem2 = new JMenuItem("New menu item");
-                jMenuResetWorkspace = new JMenuItem("Reset Workspace");
-                jMenuFileItemSave = new JMenuItem("Save");
-            jMenu2 = new JMenu("New menu");
+        // Menu File
+        jMenuFile = new JMenu("File");
+        jMenuFileItem2 = new JMenuItem("New menu item");
+        jMenuResetWorkspace = new JMenuItem("Reset Workspace");
+        jMenuFileItemSave = new JMenuItem("Save");
+        jMenu2 = new JMenu("New menu");
 
         // Left Component of Frame
         jPanelWest = new JPanel();
 
-            // ImageList
-            scrollPaneImages = new JScrollPane();
-            jLabelLoadedPictures = new JLabel("Geladene Bilder");
-            imageList = new JList();
+        // ImageList
+        scrollPaneImages = new JScrollPane();
+        jLabelLoadedPictures = new JLabel("Geladene Bilder");
+        imageList = new JList();
 
-            // Buttons
-            jButtonImportImage = new JButton("Bild importieren");
-            jButtonShowPicture = new JButton("Bild anzeigen");
-            jButtonRemovePicture = new JButton("Bild entfernen");
+        // Buttons
+        jButtonImportImage = new JButton("Bild importieren");
+        jButtonShowPicture = new JButton("Bild anzeigen");
+        jButtonRemovePicture = new JButton("Bild entfernen");
 
-            // ImagePreview
-            jLabelImagePreview = new JLabel("");
-            jLabelPreviewText = new JLabel("Bildvorschau");
+        // ImagePreview
+        jLabelImagePreview = new JLabel("");
+        jLabelPreviewText = new JLabel("Bildvorschau");
 
         // right Component of Frame
         jPanelEast = new JPanel();
-            // Buttons
-            jButtonAddMP3 = new JButton("Neue MP3");
-            jButtonAttachPicture = new JButton("Bild einbauen");
+        // Buttons
+        jButtonAddMP3 = new JButton("Neue MP3");
+        jButtonAttachPicture = new JButton("Bild einbauen");
 
-            // Player
-            jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
-            playerBar = new PlayerBar();
-            jButtonPlayPause = new JButton("Start");
-            jButtonReset = new JButton("Stop");
+        // Player
+        jLabelMP3Name = new JLabel("Keine MP3-Datei geladen");
+        playerBar = new PlayerBar();
+        jButtonPlayPause = new JButton("Start");
+        jButtonReset = new JButton("Stop");
+        jPanelAttachedPictures = new JPanel();
         // displaying Frames, for testing purposes
         jLabelFrames = new JLabel("");
     }

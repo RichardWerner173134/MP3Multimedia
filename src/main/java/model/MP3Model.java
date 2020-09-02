@@ -63,10 +63,6 @@ public class MP3Model {
         loadImageModelMap();
     }
 
-    public void setMP3WithoutLoad(MP3File mp3File){
-        this.mp3File = mp3File;
-    }
-
     private void loadImageModelMap() {
         if(!mp3File.hasID3v2Tag()){
             ID3v24Tag tag = new ID3v24Tag();
@@ -114,8 +110,6 @@ public class MP3Model {
                 textEncoding,
                 language,
                 apicFrameList);
-
-
     }
 
 }
