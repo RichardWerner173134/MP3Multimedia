@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-import static util.IOUtil.renameFile;
 
 public class MP3Enricher {
 
@@ -88,7 +88,7 @@ public class MP3Enricher {
         return frame;
     }
 
-    public static void attachAll(MP3Model mp3Model) {
+    public static void attachAll(MP3Model mp3Model, File saveFile) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
 
@@ -157,9 +157,30 @@ public class MP3Enricher {
             addSYLTFrame(mp3Model.getMp3File(), baos.toByteArray());
         }
 
+        saveToFile(mp3Model, saveFile);
+    }
+
+    private static void saveToFile(MP3Model mp3Model, File saveFile) {
+        if(!saveFile.getAbsolutePath().endsWith(".mp3")){
+            saveFile = new File(saveFile.getAbsolutePath() + ".mp3");
+        }
+
+        // create saveFile
+        if(!saveFile.exists()){
+            try {
+                if(saveFile.createNewFile()){
+                    System.out.println("File " + saveFile.getAbsolutePath() + " created");
+                } else {
+                    System.out.println("File " + saveFile.getAbsolutePath() + " could not be created");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
-            mp3Model.getMp3File().save();
-        } catch (IOException | TagException ex) {
+            mp3Model.getMp3File().save(saveFile);
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -187,49 +208,6 @@ public class MP3Enricher {
 
     private static byte[] calcTimestampBytes(int starttime) {
         return ByteBuffer.allocate(4).putInt(starttime).array();
-    }
-
-
-    public static boolean customSave(File saveDestinationFile, MP3Model mp3Model) {
-        // save for later
-        MP3File editedMP3 = mp3Model.getMp3File();
-
-        // in jedem Fall: kopie erstellen, kopie befüllen, kopie speichern
-
-        // 1 Kopie erstellen
-        File uneditedCopyFile = IOUtil.createCopy(saveDestinationFile);
-        try {
-            Files.copy(editedMP3.getFile().toPath(), uneditedCopyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // 2 kopie befüllen
-        MP3File copiedMP3 = null;
-        try {
-            copiedMP3 = new MP3File(uneditedCopyFile);
-        } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-            e.printStackTrace();
-        }
-
-        // 3 kopie speichern
-        mp3Model.setMP3WithoutLoad(copiedMP3);
-        MP3Enricher.attachAll(mp3Model);
-
-        // saveDestinationFile == originale mp3: original umbenennen, kopie umbenennen, original löschen
-        if(saveDestinationFile.getAbsolutePath().equals(editedMP3.getFile().getAbsolutePath())){
-            renameFile(editedMP3, copiedMP3);
-            MP3File reloadedFile = null;
-            try {
-                reloadedFile = new MP3File(saveDestinationFile);
-            } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-                e.printStackTrace();
-            }
-            mp3Model.setMP3WithoutLoad(reloadedFile);
-            return true;
-        } else {
-            return true;
-        }
     }
 
     @Getter

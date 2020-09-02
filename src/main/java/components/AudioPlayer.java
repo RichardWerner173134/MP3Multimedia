@@ -50,8 +50,10 @@ public class AudioPlayer{
    }
 
    public void stop(){
-       pauseLocation = 0;
-       player.close();
+       if(pauseLocation != 0){
+           player.close();
+           pauseLocation = 0;
+       }
    }
 
    public void resume(){

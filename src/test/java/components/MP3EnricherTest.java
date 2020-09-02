@@ -6,6 +6,7 @@ import model.MP3Model;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.audio.mp3.MP3FileWriter;
 import org.jaudiotagger.tag.TagException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,8 @@ import java.util.*;
 import static org.mockito.Matchers.any;
 
 class MP3EnricherTest {
-    private String src = "C:/Users/Richard/Desktop/kopie.mp3";
-    private String dest = "C:/Users/Richard/Desktop/dest.mp3";
+    private String src = "src/test/resources/src.mp3";
+    private String dest = "src/test/resources/dest.mp3";
 
     public void createTestFile(){
         try {
@@ -71,7 +72,7 @@ class MP3EnricherTest {
         modelWrite.addImage("testbild2.png", bi2, 20000);
         modelWrite.addImage("testbild2.png", bi2, 0);
 
-        MP3Enricher.attachAll(modelWrite);
+        MP3Enricher.attachAll(modelWrite, mp3File.getFile());
         try {
             modelWrite.getMp3File().save();
         } catch (IOException | TagException e) {
@@ -144,39 +145,4 @@ class MP3EnricherTest {
         }
         return sortedHashMap;
     }
-
-    @Test
-    public void testSave(){
-        MP3File mp3File = null;
-        try {
-            mp3File = new MP3File("C:/Users/Richard/Desktop/dest.mp3");
-        } catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            mp3File.save();
-        } catch (IOException | TagException e) {
-            e.printStackTrace();
-        }
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void testRenameTo(){
-        MP3File file = null;
-        try {
-            file = new MP3File(new File("C:/Users/Richard/Documents/A/test.mp3"));
-        } catch (IOException | InvalidAudioFrameException | TagException | ReadOnlyFileException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            file.save();
-        } catch (IOException | TagException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 }

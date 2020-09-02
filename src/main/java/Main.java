@@ -1,4 +1,4 @@
-import gui.frame.EclipseCopyFrame;
+import gui.frame.EditorFrame;
 
 import java.awt.*;
 
@@ -8,7 +8,7 @@ public class Main {
         // old: new MP3DemoFrame();
         EventQueue.invokeLater(() -> {
             try {
-                EclipseCopyFrame frame = new EclipseCopyFrame();
+                EditorFrame frame = new EditorFrame();
             } catch (Exception e) {
                 e.printStackTrace();
             }
