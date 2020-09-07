@@ -78,7 +78,6 @@ public class PlayerBar extends JPanel {
                     e.printStackTrace();
                 }
 
-
                 double newPercentage = ((double)currentPosSec) / ((double)tracklengthSec);
                 x1 = (int)(jProgressBar.getWidth() * newPercentage);
                 x2 = x1;

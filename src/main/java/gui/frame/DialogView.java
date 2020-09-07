@@ -7,13 +7,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
 @Getter
 public class DialogView extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField jTextFieldImage;
-    private JTextField jTextFieldStart;
     private JTextField jTextFieldStartH = new JTextField();
     private JTextField jTextFieldStartM = new JTextField();
     private JTextField jTextFieldStartS = new JTextField();
@@ -22,7 +22,8 @@ public class DialogView extends JDialog {
     /**
      * Create the dialog.
      */
-    public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage) {
+    public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
+                      HashMap<String, AttachedImage> attachedImages) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -73,9 +74,13 @@ public class DialogView extends JDialog {
                         int starttimeM = Integer.parseInt(jTextFieldStartM.getText());
                         int starttimeS = Integer.parseInt(jTextFieldStartS.getText());
                         int starttimeMillis = timeInMilliSeconds(starttimeH, starttimeM, starttimeS);
+                        String imgId = attachedImages.size() + "";
+                        AttachedImage attachedImage = new AttachedImage(selectedValue, starttimeMillis);
                         mp3Model.addImage(selectedValue,
                                 bufferedImage,
                                 starttimeMillis);
+
+                        attachedImages.put(imgId, attachedImage);
                         dispose();
                     }catch(NumberFormatException ex){
                         ex.printStackTrace();
