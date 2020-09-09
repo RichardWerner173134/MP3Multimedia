@@ -17,6 +17,7 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import util.IOUtil;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -86,7 +87,7 @@ public class MP3Enricher {
         return frame;
     }
 
-    public static void attachAll(MP3Model mp3Model, File saveFile) {
+    public static boolean attachAll(MP3Model mp3Model, File saveFile) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
 
@@ -137,6 +138,7 @@ public class MP3Enricher {
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
+                return false;
             }
 
             byte[] timestampBytes = calcTimestampBytes(e.timestamp);
@@ -146,6 +148,7 @@ public class MP3Enricher {
                 baos.write(timestampBytes);
             } catch (IOException ex) {
                 ex.printStackTrace();
+                return false;
             }
 
         }
@@ -156,9 +159,10 @@ public class MP3Enricher {
         }
 
         saveToFile(mp3Model, saveFile);
+        return true;
     }
 
-    private static void saveToFile(MP3Model mp3Model, File saveFile) {
+    private static boolean saveToFile(MP3Model mp3Model, File saveFile) {
         if(!saveFile.getAbsolutePath().endsWith(".mp3")){
             saveFile = new File(saveFile.getAbsolutePath() + ".mp3");
         }
@@ -173,6 +177,7 @@ public class MP3Enricher {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
             Path src = mp3Model.getMp3File().getFile().toPath();
             Path dest = saveFile.toPath();
@@ -180,6 +185,7 @@ public class MP3Enricher {
                 Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
         }
 
@@ -187,7 +193,9 @@ public class MP3Enricher {
             mp3Model.getMp3File().save(saveFile);
         } catch (IOException ex) {
             ex.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     private static boolean isImageAttached(MP3File mp3File, String key) {

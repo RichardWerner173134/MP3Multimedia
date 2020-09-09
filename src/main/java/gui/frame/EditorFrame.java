@@ -124,7 +124,7 @@ public class EditorFrame extends JFrame {
 
         jLabelImagePreview.setBounds(10, 251, 168, 106);
         jPanelWest.add(jLabelImagePreview);
-        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("img/blank.png").getScaledInstance(
                 jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
         jLabelImagePreview.setIcon(imageIcon);
 
@@ -217,7 +217,7 @@ public class EditorFrame extends JFrame {
             }
             else{
                 ImageIcon imageIcon = new ImageIcon(
-                        IOUtil.loadImgFromResources("blank.png")
+                        IOUtil.loadImgFromResources("img/blank.png")
                                 .getScaledInstance(jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
                 jLabelImagePreview.setIcon(imageIcon);
             }
@@ -266,7 +266,11 @@ public class EditorFrame extends JFrame {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File saveFile = fileChooser.getSelectedFile();
                 if(saveFile != null){
-                    MP3Enricher.attachAll(mp3Model, saveFile);
+                    if(MP3Enricher.attachAll(mp3Model, saveFile)){
+                        JOptionPane.showMessageDialog(this, "Speichern erfolgreich");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Speichern fehlgeschlagen");
+                    }
                 }
             }
         });
@@ -379,7 +383,7 @@ public class EditorFrame extends JFrame {
         this.attachedPictures = new HashMap<>();
 
         this.jLabelPreviewText.setText("Bildvorschau");
-        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("img/blank.png").getScaledInstance(
                 jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
         this.jLabelImagePreview.setIcon(imageIcon);
         this.jButtonAttachPicture.setEnabled(false);
