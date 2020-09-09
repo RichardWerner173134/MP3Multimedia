@@ -6,6 +6,8 @@ import model.MP3Model;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
@@ -17,13 +19,14 @@ public class DialogView extends JDialog {
     private JTextField jTextFieldStartH = new JTextField();
     private JTextField jTextFieldStartM = new JTextField();
     private JTextField jTextFieldStartS = new JTextField();
-
+    private JLabel jLabelInfo = new JLabel("");
+    private JButton okButton;
 
     /**
      * Create the dialog.
      */
     public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                      HashMap<String, AttachedImage> attachedImages) {
+                      HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -59,12 +62,21 @@ public class DialogView extends JDialog {
         contentPanel.add(jTextFieldStartS);
         jTextFieldStartS.setColumns(10);
 
+        jLabelInfo.setBounds(12,35,200,44);
+        contentPanel.add(jLabelInfo);
+
+        if(currentTimeStamp != null){
+            jTextFieldStartS.setText(currentTimeStamp[0] + "");
+            jTextFieldStartM.setText(currentTimeStamp[1] + "");
+            jTextFieldStartH.setText(currentTimeStamp[2] + "");
+        }
+
         {
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
-                JButton okButton = new JButton("OK");
+                okButton = new JButton("OK");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);
@@ -94,6 +106,43 @@ public class DialogView extends JDialog {
                 cancelButton.addActionListener(e -> dispose());
             }
         }
+        jTextFieldStartH.addKeyListener(getNewAdapter(jTextFieldStartH));
+        jTextFieldStartM.addKeyListener(getNewAdapter(jTextFieldStartM));
+        jTextFieldStartS.addKeyListener(getNewAdapter(jTextFieldStartS));
+    }
+
+    private KeyAdapter getNewAdapter(JTextField jTextField){
+        KeyAdapter keyAdapter = new KeyAdapter(){
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+
+                // validate timestamp input
+                String value = jTextField.getText();
+                char[] valueChars = value.toCharArray();
+                boolean isValid = true;
+                for(char c : valueChars){
+                    if(!(c >= '0' && c <= '9')){
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                if (!isValid){
+                    jLabelInfo.setText("Bitte nur Ziffern eingeben [0-9]");
+                    okButton.setEnabled(false);
+                } else{
+                    jLabelInfo.setText("");
+                    if(isEmpty()){
+                        okButton.setEnabled(false);
+                    } else {
+                        okButton.setEnabled(true);
+                    }
+                }
+            }
+
+        };
+        return keyAdapter;
     }
 
     private int timeInMilliSeconds(int hour, int minute, int seconds) {
@@ -102,5 +151,9 @@ public class DialogView extends JDialog {
         milliSecondsFromZero += minute * 60 * 1000;
         milliSecondsFromZero += hour * 60 * 60 * 1000;
         return milliSecondsFromZero;
+    }
+
+    private boolean isEmpty() {
+        return jTextFieldStartH.getText().isEmpty() || jTextFieldStartM.getText().isEmpty() || jTextFieldStartS.getText().isEmpty();
     }
 }

@@ -12,12 +12,14 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 
@@ -25,12 +27,12 @@ class MP3EnricherTest {
     private String src = "src/test/resources/src.mp3";
     private String dest = "src/test/resources/dest.mp3";
 
-    public void createTestFile(){
+    public void createTestFile() {
         try {
             File f = new File(dest);
-            if(f.createNewFile()){
+            if (f.createNewFile()) {
                 System.out.println("File create successfully");
-            } else{
+            } else {
                 System.out.println("File already exists");
             }
             Files.copy(new File(src).toPath(), new File(dest).toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -100,24 +102,24 @@ class MP3EnricherTest {
     }
 
 
-    private boolean isImageModelMapEualsTo(HashMap<String, ImageModel> modelWrite,HashMap<String, ImageModel> modelRead){
+    private boolean isImageModelMapEualsTo(HashMap<String, ImageModel> modelWrite, HashMap<String, ImageModel> modelRead) {
         /**
          * model1: alle timestamps für bild1 raussuchen
          * für jeden timestamp schauen, ob bei model2 der starttimewert übereinstimmt
          */
 
         Iterator itM1 = modelWrite.entrySet().iterator();
-        while(itM1.hasNext()){
+        while (itM1.hasNext()) {
             Map.Entry entry = (Map.Entry) itM1.next();
             String imageName = (String) entry.getKey();
             ImageModel im1 = (ImageModel) entry.getValue();
 
             Iterator itTimeStamps = im1.getTimestampMap().entrySet().iterator();
-            while(itTimeStamps.hasNext()){
+            while (itTimeStamps.hasNext()) {
                 Map.Entry entry2 = (Map.Entry) itTimeStamps.next();
 
-                if(!(((ContentTimeStamp)entry2.getValue()).getStarttime() == modelRead.get(imageName).getTimestampMap()
-                        .get((String)entry2.getKey()).getStarttime())){
+                if (!(((ContentTimeStamp) entry2.getValue()).getStarttime() == modelRead.get(imageName).getTimestampMap()
+                        .get((String) entry2.getKey()).getStarttime())) {
                     return false;
                 }
             }
@@ -131,18 +133,19 @@ class MP3EnricherTest {
         // Defined Custom Comparator here
         Collections.sort(list, new Comparator() {
             public int compare(Object o1, Object o2) {
-                return ((Comparable) ((ContentTimeStamp)((Map.Entry) (o1)).getValue()).getStarttime())
-                        .compareTo(((ContentTimeStamp)((Map.Entry) (o2)).getValue()).getStarttime());
+                return ((Comparable) ((ContentTimeStamp) ((Map.Entry) (o1)).getValue()).getStarttime())
+                        .compareTo(((ContentTimeStamp) ((Map.Entry) (o2)).getValue()).getStarttime());
             }
         });
 
         // Here I am copying the sorted list in HashMap
         // using LinkedHashMap to preserve the insertion order
         HashMap sortedHashMap = new LinkedHashMap();
-        for (Iterator it = list.iterator(); it.hasNext();) {
+        for (Iterator it = list.iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             sortedHashMap.put(entry.getKey(), entry.getValue());
         }
         return sortedHashMap;
     }
+
 }

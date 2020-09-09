@@ -23,9 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
 
 
@@ -173,6 +171,13 @@ public class MP3Enricher {
                 } else {
                     System.out.println("File " + saveFile.getAbsolutePath() + " could not be created");
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Path src = mp3Model.getMp3File().getFile().toPath();
+            Path dest = saveFile.toPath();
+            try {
+                Files.copy(src, dest);
             } catch (IOException e) {
                 e.printStackTrace();
             }

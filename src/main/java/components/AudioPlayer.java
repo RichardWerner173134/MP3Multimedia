@@ -36,7 +36,7 @@ public class AudioPlayer{
     public void pause(PlayerBar playerBar){
        if(player != null){
            try {
-               pauseLocation = songTotalLength - fis.available() - 10000;
+               pauseLocation = songTotalLength - fis.available();
                player.close();
                playerBar.stopDrawing();
            } catch (IOException e) {
@@ -67,5 +67,25 @@ public class AudioPlayer{
 
    public void setPath(String path){
        this.path = path;
+   }
+
+   public int[] getTimeStampPosition(int tracklength){
+       // pauselocation, songtotallength, tracklength
+
+       double pauseLocationPercentage = ((double)pauseLocation) / ((double)songTotalLength);
+       int sStartAll = (int) (pauseLocationPercentage * tracklength);
+
+
+       int [] hms = new int[3];
+       int sStart, hStart, mStart;
+
+       hStart = sStartAll / (60*60);
+       mStart = (sStartAll - hStart * 60 * 60) / 60;
+       sStart = (sStartAll - hStart * 60 * 60 - mStart * 60) % 60;
+
+       hms[0] = sStart;
+       hms[1] = mStart;
+       hms[2] = hStart;
+       return hms;
    }
 }
