@@ -15,8 +15,11 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -171,6 +174,11 @@ public class EditorFrame extends JFrame {
         jButtonAddMP3.addActionListener(e -> {
             MP3File mp3File = null;
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileFilter mp3Filter = new FileNameExtensionFilter(
+                    "MP3", "mp3");
+            fileChooser.setFileFilter(mp3Filter);
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
@@ -195,9 +203,17 @@ public class EditorFrame extends JFrame {
         // Importieren von Bilddatei
         jButtonImportImage.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(true);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileFilter imageFilter = new FileNameExtensionFilter(
+                    "Image files", "jpg", "png");
+            fileChooser.setFileFilter(imageFilter);
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if(returnVal == JFileChooser.APPROVE_OPTION){
-                imageListModel.addImage(fileChooser.getSelectedFile());
+                File[] selectedFiles = fileChooser.getSelectedFiles();
+                for(File f : selectedFiles){
+                    imageListModel.addImage(f);
+                }
                 imageList.setModel(imageListModel);
             }
         });
