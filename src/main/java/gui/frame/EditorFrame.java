@@ -56,7 +56,7 @@ public class EditorFrame extends JFrame {
 
     private AudioPlayer player;
     private HashMap<String, AttachedImage> attachedPictures;
-
+    private int [] currentTimeStamp;
     /**
      * Create the frame.
      */
@@ -69,6 +69,7 @@ public class EditorFrame extends JFrame {
         mp3Model = new MP3Model();
         imageListModel = new ImageListModel();
         attachedPictures = new HashMap<>();
+        currentTimeStamp = new int[3];
 
         initComponents();
         initPanel();
@@ -209,9 +210,20 @@ public class EditorFrame extends JFrame {
         // Löst Dialog aus, wenn button betätigt wird und ein Bild ausgewählt ist
         jButtonAttachPicture.addActionListener(e -> {
             String selectedValue = (String) imageList.getSelectedValue();
+            if(player != null){
+                if(jButtonPlayPause.getText().equals("Pause")) {
+                    player.pause(playerBar);
+                    long pauselocation = player.getPauseLocation();
+                    currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
+                    jButtonPlayPause.setText("Start");
+                } else{
+                    currentTimeStamp = player.getTimeStampPosition(0);
+                }
+            }
+
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
-                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi, attachedPictures);
+                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi, attachedPictures, currentTimeStamp);
                 dialogView.setEnabled(true);
                 dialogView.setAlwaysOnTop(true);
                 dialogView.addWindowListener(new WindowAdapter() {
@@ -254,6 +266,8 @@ public class EditorFrame extends JFrame {
                 jButtonPlayPause.setText("Pause");
             } else if(jButtonPlayPause.getText().equals("Pause")){
                 player.pause(playerBar);
+                long pauselocation = player.getPauseLocation();
+                currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
                 jButtonPlayPause.setText("Start");
             }
         });
