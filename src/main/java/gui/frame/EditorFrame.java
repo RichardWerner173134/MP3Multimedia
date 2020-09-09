@@ -2,7 +2,9 @@ package gui.frame;
 
 import components.AudioPlayer;
 import components.MP3Enricher;
+import model.ContentTimeStamp;
 import model.ImageListModel;
+import model.ImageModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -175,6 +177,8 @@ public class EditorFrame extends JFrame {
                 jLabelMP3Name.setText(mp3File.getFile().getAbsolutePath());
                 playerBar.displayMP3();
 
+                initExistingAttachedPictures();
+
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
                 jButtonPlayPause.setEnabled(true);
             }
@@ -285,6 +289,22 @@ public class EditorFrame extends JFrame {
         jMenuResetWorkspace.addActionListener(e -> {
             resetUI();
         });
+    }
+
+    private void initExistingAttachedPictures() {
+        Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry imageModelEntry = (Map.Entry) it.next();
+            Iterator it2 = ((ImageModel)imageModelEntry.getValue()).getTimestampMap().entrySet().iterator();
+            while(it2.hasNext()){
+                Map.Entry timeStampModelEntry = (Map.Entry) it2.next();
+                AttachedImage attachedImage = new AttachedImage((String) imageModelEntry.getKey(),
+                        ((ContentTimeStamp)timeStampModelEntry.getValue()).getStarttime());
+                attachedPictures.put(attachedPictures.size() + "", attachedImage);
+            }
+
+        }
+        repaint();
     }
 
     @Override
