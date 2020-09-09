@@ -12,6 +12,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
+import util.IOUtil;
 import util.Other;
 
 import javax.swing.*;
@@ -101,7 +102,7 @@ public class EditorFrame extends JFrame {
         contentPane.add(jPanelWest);
         jPanelWest.setLayout(null);
 
-        jButtonImportImage.setBounds(203, 7, 131, 21);
+        jButtonImportImage.setBounds(220, 7, 131, 21);
         jPanelWest.add(jButtonImportImage);
 
         scrollPaneImages.setBounds(10, 10, 168, 219);
@@ -113,16 +114,19 @@ public class EditorFrame extends JFrame {
         scrollPaneImages.setColumnHeaderView(jLabelLoadedPictures);
         scrollPaneImages.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        jButtonRemovePicture.setBounds(203, 96, 131, 21);
+        jButtonRemovePicture.setBounds(220, 99, 131, 21);
         jButtonRemovePicture.setEnabled(false);
         jPanelWest.add(jButtonRemovePicture);
 
-        jButtonShowPicture.setBounds(203, 50, 131, 21);
+        jButtonShowPicture.setBounds(220, 52, 131, 21);
         jButtonShowPicture.setEnabled(false);
         jPanelWest.add(jButtonShowPicture);
 
         jLabelImagePreview.setBounds(10, 251, 168, 106);
         jPanelWest.add(jLabelImagePreview);
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+                jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
+        jLabelImagePreview.setIcon(imageIcon);
 
         jLabelPreviewText.setBounds(10, 369, 168, 82);
         jPanelWest.add(jLabelPreviewText);
@@ -131,7 +135,7 @@ public class EditorFrame extends JFrame {
         contentPane.add(jPanelEast);
         jPanelEast.setLayout(null);
 
-        jLabelMP3Name.setBounds(12, 91, 635, 19);
+        jLabelMP3Name.setBounds(48, 90, 148, 19);
         jLabelMP3Name.setForeground(Color.GRAY);
         jLabelMP3Name.setBackground(Color.BLACK);
         jPanelEast.add(jLabelMP3Name);
@@ -147,14 +151,15 @@ public class EditorFrame extends JFrame {
         jButtonReset.setEnabled(false);
         jPanelEast.add(jButtonReset);
 
-        jButtonAddMP3.setBounds(10, 10, 104, 21);
+        jButtonAddMP3.setBounds(48, 10, 104, 21);
         jPanelEast.add(jButtonAddMP3);
 
         jLabelFrames.setBounds(48, 202, 148, 194);
         jPanelEast.add(jLabelFrames);
 
-        jButtonAttachPicture.setBounds(126, 10, 104, 21);
-        jPanelEast.add(jButtonAttachPicture);
+        jButtonAttachPicture.setBounds(220, 169, 131, 61);
+        jPanelWest.add(jButtonAttachPicture);
+        jButtonAttachPicture.setEnabled(false);
 
         jPanelAttachedPictures.setBounds(playerBar.getX(), playerBar.getY() + 50, playerBar.getWidth(), 50);
         jPanelAttachedPictures.setLayout(null);
@@ -181,6 +186,9 @@ public class EditorFrame extends JFrame {
 
                 player = new AudioPlayer(mp3Model.getMp3File().getFile().getAbsolutePath());
                 jButtonPlayPause.setEnabled(true);
+                if(imageList.getSelectedValue() != null){
+                    jButtonAttachPicture.setEnabled(true);
+                }
             }
         });
 
@@ -203,9 +211,15 @@ public class EditorFrame extends JFrame {
                         Image.SCALE_SMOOTH));
                 jLabelImagePreview.setIcon(icon);
                 jLabelPreviewText.setText("<html><body>" + selectedValue + "<br/> size: " + bi.getHeight() + " x " + bi.getWidth() + "</body></html>");
+                if(mp3Model.getMp3File() != null){
+                    jButtonAttachPicture.setEnabled(true);
+                }
             }
             else{
-                jLabelImagePreview.setIcon(null);
+                ImageIcon imageIcon = new ImageIcon(
+                        IOUtil.loadImgFromResources("blank.png")
+                                .getScaledInstance(jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
+                jLabelImagePreview.setIcon(imageIcon);
             }
         });
 
@@ -311,6 +325,7 @@ public class EditorFrame extends JFrame {
     public void paint(Graphics g){
 
         if(attachedPictures.size() == 0){
+            jPanelAttachedPictures.revalidate();
             super.paint(g);
             return;
         }
@@ -361,12 +376,19 @@ public class EditorFrame extends JFrame {
         this.jButtonReset.setEnabled(false);
         this.jLabelMP3Name.setText("Keine MP3 geladen");
         this.jLabelFrames.setText("");
+        this.attachedPictures = new HashMap<>();
 
         this.jLabelPreviewText.setText("Bildvorschau");
-        this.jLabelImagePreview.setIcon(null);
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+                jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
+        this.jLabelImagePreview.setIcon(imageIcon);
+        this.jButtonAttachPicture.setEnabled(false);
+        this.jPanelAttachedPictures.removeAll();
 
         this.mp3Model = new MP3Model();
         this.playerBar.displayNothing();
+
+        repaint();
     }
 
     private void initComponents() {
