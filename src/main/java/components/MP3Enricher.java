@@ -177,7 +177,7 @@ public class MP3Enricher {
             Path src = mp3Model.getMp3File().getFile().toPath();
             Path dest = saveFile.toPath();
             try {
-                Files.copy(src, dest);
+                Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
