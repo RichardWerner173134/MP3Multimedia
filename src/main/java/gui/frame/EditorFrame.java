@@ -15,8 +15,11 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -124,7 +127,7 @@ public class EditorFrame extends JFrame {
 
         jLabelImagePreview.setBounds(10, 251, 168, 106);
         jPanelWest.add(jLabelImagePreview);
-        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("img/blank.png").getScaledInstance(
                 jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
         jLabelImagePreview.setIcon(imageIcon);
 
@@ -171,6 +174,11 @@ public class EditorFrame extends JFrame {
         jButtonAddMP3.addActionListener(e -> {
             MP3File mp3File = null;
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileFilter mp3Filter = new FileNameExtensionFilter(
+                    "MP3", "mp3");
+            fileChooser.setFileFilter(mp3Filter);
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
@@ -195,9 +203,17 @@ public class EditorFrame extends JFrame {
         // Importieren von Bilddatei
         jButtonImportImage.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(true);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileFilter imageFilter = new FileNameExtensionFilter(
+                    "Image files", "jpg", "png");
+            fileChooser.setFileFilter(imageFilter);
             int returnVal = fileChooser.showOpenDialog(contentPane);
             if(returnVal == JFileChooser.APPROVE_OPTION){
-                imageListModel.addImage(fileChooser.getSelectedFile());
+                File[] selectedFiles = fileChooser.getSelectedFiles();
+                for(File f : selectedFiles){
+                    imageListModel.addImage(f);
+                }
                 imageList.setModel(imageListModel);
             }
         });
@@ -217,7 +233,7 @@ public class EditorFrame extends JFrame {
             }
             else{
                 ImageIcon imageIcon = new ImageIcon(
-                        IOUtil.loadImgFromResources("blank.png")
+                        IOUtil.loadImgFromResources("img/blank.png")
                                 .getScaledInstance(jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
                 jLabelImagePreview.setIcon(imageIcon);
             }
@@ -231,7 +247,6 @@ public class EditorFrame extends JFrame {
             if(player != null){
                 if(jButtonPlayPause.getText().equals("Pause")) {
                     player.pause(playerBar);
-                    long pauselocation = player.getPauseLocation();
                     currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
                     jButtonPlayPause.setText("Start");
                 } else{
@@ -266,7 +281,11 @@ public class EditorFrame extends JFrame {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File saveFile = fileChooser.getSelectedFile();
                 if(saveFile != null){
-                    MP3Enricher.attachAll(mp3Model, saveFile);
+                    if(MP3Enricher.attachAll(mp3Model, saveFile)){
+                        JOptionPane.showMessageDialog(this, "Speichern erfolgreich");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Speichern fehlgeschlagen");
+                    }
                 }
             }
         });
@@ -284,7 +303,6 @@ public class EditorFrame extends JFrame {
                 jButtonPlayPause.setText("Pause");
             } else if(jButtonPlayPause.getText().equals("Pause")){
                 player.pause(playerBar);
-                long pauselocation = player.getPauseLocation();
                 currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
                 jButtonPlayPause.setText("Start");
             }
@@ -379,7 +397,7 @@ public class EditorFrame extends JFrame {
         this.attachedPictures = new HashMap<>();
 
         this.jLabelPreviewText.setText("Bildvorschau");
-        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("blank.png").getScaledInstance(
+        ImageIcon imageIcon = new ImageIcon(IOUtil.loadImgFromResources("img/blank.png").getScaledInstance(
                 jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(), Image.SCALE_SMOOTH));
         this.jLabelImagePreview.setIcon(imageIcon);
         this.jButtonAttachPicture.setEnabled(false);
