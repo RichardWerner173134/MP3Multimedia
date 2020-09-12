@@ -8,10 +8,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
-import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
-import org.jaudiotagger.tag.id3.ID3v24Frame;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.*;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import util.IOUtil;
@@ -74,8 +71,8 @@ public class MP3Enricher {
         ((ArrayList)tag.frameMap.get("APIC")).add(frame);
     }
 
-    public static ID3v24Frame createAPICFrame(byte[] data, String fileName){
-        ID3v24Frame frame = new ID3v24Frame("APIC");
+    public static ID3v23Frame createAPICFrame(byte[] data, String fileName){
+        AbstractID3v2Frame frame = new ID3v23Frame("APIC");
         String fileExtension = "image/" + Optional.ofNullable(fileName)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(fileName.lastIndexOf(".") + 1))
@@ -84,7 +81,7 @@ public class MP3Enricher {
         byte pictureType = (byte) 0;
         FrameBodyAPIC frameBody = new FrameBodyAPIC(textEncoding, fileExtension, pictureType, fileName, data);
         frame.setBody(frameBody);
-        return frame;
+        return (ID3v23Frame) frame;
     }
 
     public static boolean attachAll(MP3Model mp3Model, File saveFile) {
@@ -131,11 +128,7 @@ public class MP3Enricher {
 
             // SYLT Frame Bytes generieren bauen
             try {
-                if(baos.toByteArray().length == 0){
-                    baos.write(StandardCharsets.ISO_8859_1.encode(e.key).array());
-                } else{
-                    baos.write(StandardCharsets.ISO_8859_1.encode("\n" + e.key).array());
-                }
+                baos.write(StandardCharsets.ISO_8859_1.encode(e.key).array());
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return false;
@@ -199,23 +192,23 @@ public class MP3Enricher {
     }
 
     private static boolean isImageAttached(MP3File mp3File, String key) {
-        ID3v24Tag tag = mp3File.getID3v2TagAsv24();
+        AbstractID3v2Tag tag = mp3File.getID3v2Tag();
         if(tag.frameMap.containsKey("APIC")){
             if(tag.frameMap.get("APIC") instanceof ArrayList){
-                for(ID3v24Frame f : (ArrayList<ID3v24Frame>)tag.frameMap.get("APIC")){
+                for(AbstractID3v2Frame f : (ArrayList<AbstractID3v2Frame>)tag.frameMap.get("APIC")){
                     if (((FrameBodyAPIC)f.getBody()).getDescription().trim().equals(key.trim())){
                         return true;
                     }
                 }
-            } else if(tag.frameMap.get("APIC") instanceof ID3v24Frame){
-                return ((FrameBodyAPIC)((ID3v24Frame)tag.frameMap.get("APIC")).getBody()).getDescription().trim().equals(key.trim());
+            } else if(tag.frameMap.get("APIC") instanceof AbstractID3v2Frame){
+                return ((FrameBodyAPIC)((AbstractID3v2Frame)tag.frameMap.get("APIC")).getBody()).getDescription().trim().equals(key.trim());
             }
         }
         return false;
     }
 
     private static void attachImage(BufferedImage bi, String filename, MP3File mp3File) {
-        ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
+        ID3v23Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
         addAPICFrame(mp3File, apicFrame);
     }
 

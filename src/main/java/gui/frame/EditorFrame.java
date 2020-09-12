@@ -247,7 +247,6 @@ public class EditorFrame extends JFrame {
             if(player != null){
                 if(jButtonPlayPause.getText().equals("Pause")) {
                     player.pause(playerBar);
-                    long pauselocation = player.getPauseLocation();
                     currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
                     jButtonPlayPause.setText("Start");
                 } else{
@@ -304,7 +303,6 @@ public class EditorFrame extends JFrame {
                 jButtonPlayPause.setText("Pause");
             } else if(jButtonPlayPause.getText().equals("Pause")){
                 player.pause(playerBar);
-                long pauselocation = player.getPauseLocation();
                 currentTimeStamp = player.getTimeStampPosition(mp3Model.getMp3File().getAudioHeader().getTrackLength());
                 jButtonPlayPause.setText("Start");
             }
