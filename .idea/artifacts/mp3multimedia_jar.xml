@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="recorderApp:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/recorderApp_jar</output-path>
+  <artifact type="jar" name="mp3multimedia:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/mp3multimedia_jar</output-path>
     <root id="archive" name="recorderApp.jar">
       <element id="module-output" name="recorderApp" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/ws/schild/jave-nativebin-osx64/2.7.3/jave-nativebin-osx64-2.7.3.jar" path-in-jar="/" />
