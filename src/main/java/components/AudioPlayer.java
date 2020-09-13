@@ -1,6 +1,5 @@
 package components;
 
-import gui.frame.EditorFrame;
 import gui.frame.PlayerBar;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;

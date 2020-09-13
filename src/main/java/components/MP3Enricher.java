@@ -4,24 +4,22 @@ import lombok.Getter;
 import model.ContentTimeStamp;
 import model.ImageModel;
 import model.MP3Model;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.*;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
-import util.IOUtil;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 
@@ -71,8 +69,8 @@ public class MP3Enricher {
         ((ArrayList)tag.frameMap.get("APIC")).add(frame);
     }
 
-    public static ID3v23Frame createAPICFrame(byte[] data, String fileName){
-        AbstractID3v2Frame frame = new ID3v23Frame("APIC");
+    public static ID3v24Frame createAPICFrame(byte[] data, String fileName){
+        ID3v24Frame frame = new ID3v24Frame("APIC");
         String fileExtension = "image/" + Optional.ofNullable(fileName)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(fileName.lastIndexOf(".") + 1))
@@ -81,13 +79,17 @@ public class MP3Enricher {
         byte pictureType = (byte) 0;
         FrameBodyAPIC frameBody = new FrameBodyAPIC(textEncoding, fileExtension, pictureType, fileName, data);
         frame.setBody(frameBody);
-        return (ID3v23Frame) frame;
+        return frame;
     }
 
     public static boolean attachAll(MP3Model mp3Model, File saveFile) {
+        if(! (mp3Model.getMp3File().getID3v2Tag() instanceof ID3v24Tag)){
+            ID3v24Tag newTag = mp3Model.getMp3File().getID3v2TagAsv24();
+            mp3Model.getMp3File().setID3v2Tag(newTag);
+        }
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
-
         LinkedList<Entry> entryList = new LinkedList<>();
 
         while(it.hasNext()){
@@ -155,6 +157,7 @@ public class MP3Enricher {
         return true;
     }
 
+
     private static boolean saveToFile(MP3Model mp3Model, File saveFile) {
         if(!saveFile.getAbsolutePath().endsWith(".mp3")){
             saveFile = new File(saveFile.getAbsolutePath() + ".mp3");
@@ -208,7 +211,7 @@ public class MP3Enricher {
     }
 
     private static void attachImage(BufferedImage bi, String filename, MP3File mp3File) {
-        ID3v23Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
+        ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
         addAPICFrame(mp3File, apicFrame);
     }
 
