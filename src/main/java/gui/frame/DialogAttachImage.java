@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 @Getter
-public class DialogView extends JDialog {
+public class DialogAttachImage extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField jTextFieldImage;
@@ -25,8 +25,8 @@ public class DialogView extends JDialog {
     /**
      * Create the dialog.
      */
-    public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                      HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp) {
+    public DialogAttachImage(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
+                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);

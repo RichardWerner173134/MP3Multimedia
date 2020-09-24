@@ -55,24 +55,24 @@ class MP3EnricherTest {
 
         BufferedImage bi = null;
         try {
-            bi = ImageIO.read(new File("C:/Users/Richard/Documents/testbild1.png"));
+            bi = ImageIO.read(new File("C:/Users/Richard/Documents/A.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         BufferedImage bi2 = null;
         try {
-            bi2 = ImageIO.read(new File("C:/Users/Richard/Documents/testbild2.png"));
+            bi2 = ImageIO.read(new File("C:/Users/Richard/Documents/AA.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        modelWrite.addImage("testbild1.png", bi, 15000);
-        modelWrite.addImage("testbild1.png", bi, 25000);
-        modelWrite.addImage("testbild1.png", bi, 5000);
-        modelWrite.addImage("testbild2.png", bi2, 10000);
-        modelWrite.addImage("testbild2.png", bi2, 20000);
-        modelWrite.addImage("testbild2.png", bi2, 0);
+        modelWrite.addImage("A.png", bi, 15000);
+        modelWrite.addImage("A.png", bi, 25000);
+        modelWrite.addImage("A.png", bi, 5000);
+        modelWrite.addImage("AA.png", bi2, 10000);
+        modelWrite.addImage("AA.png", bi2, 20000);
+        modelWrite.addImage("AA.png", bi2, 0);
 
         MP3Enricher.attachAll(modelWrite, mp3File.getFile());
         try {
@@ -147,5 +147,4 @@ class MP3EnricherTest {
         }
         return sortedHashMap;
     }
-
 }

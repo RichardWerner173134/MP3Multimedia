@@ -15,7 +15,6 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -59,10 +58,18 @@ public class EditorFrame extends JFrame {
     private JPanel          jPanelAttachedPictures;
     private MP3Model        mp3Model;
     private ImageListModel  imageListModel;
+    private JTextField      jTextFieldImageName;
+    private JTextField      jTextFieldStartTimeH;
+    private JTextField      jTextFieldStopTimeH;
+    private JTextField      jTextFieldStartTimeM;
+    private JTextField      jTextFieldStartTimeS;
+    private JTextField      jTextFieldStopTimeM;
+    private JTextField      jTextFieldStopTimeS;
 
     private AudioPlayer player;
     private HashMap<String, AttachedImage> attachedPictures;
     private int [] currentTimeStamp;
+
     /**
      * Create the frame.
      */
@@ -167,6 +174,63 @@ public class EditorFrame extends JFrame {
         jPanelAttachedPictures.setBounds(playerBar.getX(), playerBar.getY() + 50, playerBar.getWidth(), 50);
         jPanelAttachedPictures.setLayout(null);
         jPanelEast.add(jPanelAttachedPictures);
+
+        JPanel panel = new JPanel();
+        panel.setBounds(48, 290, 341, 112);
+        jPanelEast.add(panel);
+        panel.setLayout(null);
+
+        JLabel jLabelImageName = new JLabel("Bilddatei");
+        jLabelImageName.setBounds(25, 10, 38, 13);
+        panel.add(jLabelImageName);
+
+        JLabel jLabelStarttime = new JLabel("Startzeit");
+        jLabelStarttime.setBounds(25, 44, 45, 13);
+        panel.add(jLabelStarttime);
+
+        JLabel jLabelStopTime = new JLabel("Stoppzeit");
+        jLabelStopTime.setBounds(25, 78, 45, 13);
+        panel.add(jLabelStopTime);
+
+        jTextFieldImageName = new JTextField();
+        jTextFieldImageName.setEditable(false);
+        jTextFieldImageName.setBounds(132, 7, 155, 19);
+        panel.add(jTextFieldImageName);
+        jTextFieldImageName.setColumns(10);
+
+        jTextFieldStartTimeH = new JTextField();
+        jTextFieldStartTimeH.setBounds(132, 41, 45, 19);
+        panel.add(jTextFieldStartTimeH);
+        jTextFieldStartTimeH.setColumns(10);
+
+        jTextFieldStopTimeH = new JTextField();
+        jTextFieldStopTimeH.setEditable(false);
+        jTextFieldStopTimeH.setBounds(132, 75, 45, 19);
+        panel.add(jTextFieldStopTimeH);
+        jTextFieldStopTimeH.setColumns(10);
+
+        jTextFieldStartTimeM = new JTextField();
+        jTextFieldStartTimeM.setColumns(10);
+        jTextFieldStartTimeM.setBounds(187, 41, 45, 19);
+        panel.add(jTextFieldStartTimeM);
+
+        jTextFieldStartTimeS = new JTextField();
+        jTextFieldStartTimeS.setColumns(10);
+        jTextFieldStartTimeS.setBounds(242, 41, 45, 19);
+        panel.add(jTextFieldStartTimeS);
+
+        jTextFieldStopTimeM = new JTextField();
+        jTextFieldStopTimeM.setEditable(false);
+        jTextFieldStopTimeM.setColumns(10);
+        jTextFieldStopTimeM.setBounds(187, 75, 45, 19);
+        panel.add(jTextFieldStopTimeM);
+
+        jTextFieldStopTimeS = new JTextField();
+        jTextFieldStopTimeS.setEditable(false);
+        jTextFieldStopTimeS.setColumns(10);
+        jTextFieldStopTimeS.setBounds(242, 75, 45, 19);
+        panel.add(jTextFieldStopTimeS);
+
     }
 
     private void addActionListeners() {
@@ -256,10 +320,10 @@ public class EditorFrame extends JFrame {
 
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
-                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi, attachedPictures, currentTimeStamp);
-                dialogView.setEnabled(true);
-                dialogView.setAlwaysOnTop(true);
-                dialogView.addWindowListener(new WindowAdapter() {
+                DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures, currentTimeStamp);
+                dialogAttachImage.setEnabled(true);
+                dialogAttachImage.setAlwaysOnTop(true);
+                dialogAttachImage.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
                         super.windowClosed(e);
