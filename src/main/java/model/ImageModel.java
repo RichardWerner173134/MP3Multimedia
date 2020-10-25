@@ -9,10 +9,10 @@ import java.util.HashMap;
 @Getter
 @Setter
 public class ImageModel{
-    private HashMap<String, ContentTimeStamp> timestampMap;
+    private HashMap<String, TimeStampModel> timeStampModelMap;
     private BufferedImage bufferedImage;
 
     public ImageModel(){
-        timestampMap = new HashMap<>();
+        timeStampModelMap = new HashMap<>();
     }
 }

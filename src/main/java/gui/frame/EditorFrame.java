@@ -2,7 +2,7 @@ package gui.frame;
 
 import components.AudioPlayer;
 import components.MP3Enricher;
-import model.ContentTimeStamp;
+import model.TimeStampModel;
 import model.ImageListModel;
 import model.ImageModel;
 import model.MP3Model;
@@ -16,10 +16,13 @@ import util.IOUtil;
 import util.Other;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -58,6 +61,7 @@ public class EditorFrame extends JFrame {
     private JPanel          jPanelAttachedPictures;
     private MP3Model        mp3Model;
     private ImageListModel  imageListModel;
+    private JPanel          jPanelEdit;
     private JTextField      jTextFieldImageName;
     private JTextField      jTextFieldStartTimeH;
     private JTextField      jTextFieldStopTimeH;
@@ -65,6 +69,8 @@ public class EditorFrame extends JFrame {
     private JTextField      jTextFieldStartTimeS;
     private JTextField      jTextFieldStopTimeM;
     private JTextField      jTextFieldStopTimeS;
+    private JButton         jButtonEdit;
+    private JButton         jButtonRemove;
 
     private AudioPlayer player;
     private HashMap<String, AttachedImage> attachedPictures;
@@ -175,61 +181,70 @@ public class EditorFrame extends JFrame {
         jPanelAttachedPictures.setLayout(null);
         jPanelEast.add(jPanelAttachedPictures);
 
-        JPanel panel = new JPanel();
-        panel.setBounds(48, 290, 341, 112);
-        jPanelEast.add(panel);
-        panel.setLayout(null);
+        jPanelEdit = new JPanel();
+        jPanelEdit.setBounds(48, 290, 404, 112);
+        jPanelEast.add(jPanelEdit);
+        jPanelEdit.setLayout(null);
+        jPanelEdit.setVisible(false);
 
         JLabel jLabelImageName = new JLabel("Bilddatei");
         jLabelImageName.setBounds(25, 10, 38, 13);
-        panel.add(jLabelImageName);
+        jPanelEdit.add(jLabelImageName);
 
         JLabel jLabelStarttime = new JLabel("Startzeit");
         jLabelStarttime.setBounds(25, 44, 45, 13);
-        panel.add(jLabelStarttime);
+        jPanelEdit.add(jLabelStarttime);
 
         JLabel jLabelStopTime = new JLabel("Stoppzeit");
         jLabelStopTime.setBounds(25, 78, 45, 13);
-        panel.add(jLabelStopTime);
+        jPanelEdit.add(jLabelStopTime);
 
         jTextFieldImageName = new JTextField();
         jTextFieldImageName.setEditable(false);
         jTextFieldImageName.setBounds(132, 7, 155, 19);
-        panel.add(jTextFieldImageName);
+        jPanelEdit.add(jTextFieldImageName);
         jTextFieldImageName.setColumns(10);
 
         jTextFieldStartTimeH = new JTextField();
         jTextFieldStartTimeH.setBounds(132, 41, 45, 19);
-        panel.add(jTextFieldStartTimeH);
+        jPanelEdit.add(jTextFieldStartTimeH);
         jTextFieldStartTimeH.setColumns(10);
 
         jTextFieldStopTimeH = new JTextField();
         jTextFieldStopTimeH.setEditable(false);
         jTextFieldStopTimeH.setBounds(132, 75, 45, 19);
-        panel.add(jTextFieldStopTimeH);
+        jPanelEdit.add(jTextFieldStopTimeH);
         jTextFieldStopTimeH.setColumns(10);
 
         jTextFieldStartTimeM = new JTextField();
         jTextFieldStartTimeM.setColumns(10);
         jTextFieldStartTimeM.setBounds(187, 41, 45, 19);
-        panel.add(jTextFieldStartTimeM);
+        jPanelEdit.add(jTextFieldStartTimeM);
 
         jTextFieldStartTimeS = new JTextField();
         jTextFieldStartTimeS.setColumns(10);
         jTextFieldStartTimeS.setBounds(242, 41, 45, 19);
-        panel.add(jTextFieldStartTimeS);
+        jPanelEdit.add(jTextFieldStartTimeS);
 
         jTextFieldStopTimeM = new JTextField();
         jTextFieldStopTimeM.setEditable(false);
         jTextFieldStopTimeM.setColumns(10);
         jTextFieldStopTimeM.setBounds(187, 75, 45, 19);
-        panel.add(jTextFieldStopTimeM);
+        jPanelEdit.add(jTextFieldStopTimeM);
 
         jTextFieldStopTimeS = new JTextField();
         jTextFieldStopTimeS.setEditable(false);
         jTextFieldStopTimeS.setColumns(10);
         jTextFieldStopTimeS.setBounds(242, 75, 45, 19);
-        panel.add(jTextFieldStopTimeS);
+        jPanelEdit.add(jTextFieldStopTimeS);
+
+        jButtonEdit = new JButton("Aktualisieren");
+        jButtonEdit.setBounds(309, 74, 85, 21);
+        jPanelEdit.add(jButtonEdit);
+
+        jButtonRemove = new JButton("Entfernen");
+        jButtonRemove.setBounds(309, 40, 85, 21);
+        jPanelEdit.add(jButtonRemove);
 
     }
 
@@ -372,6 +387,16 @@ public class EditorFrame extends JFrame {
             }
         });
 
+        // edit AttachedPicture
+        jButtonEdit.addActionListener(e -> {
+            // TODO edit
+        });
+
+        // remove AttachedPicture
+        jButtonRemove.addActionListener(e -> {
+            // TODO remove from MP3Model
+        });
+
         // reset/ Stop player
         jButtonReset.addActionListener(e -> {
             if(player != null){
@@ -391,11 +416,11 @@ public class EditorFrame extends JFrame {
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
         while(it.hasNext()){
             Map.Entry imageModelEntry = (Map.Entry) it.next();
-            Iterator it2 = ((ImageModel)imageModelEntry.getValue()).getTimestampMap().entrySet().iterator();
+            Iterator it2 = ((ImageModel)imageModelEntry.getValue()).getTimeStampModelMap().entrySet().iterator();
             while(it2.hasNext()){
                 Map.Entry timeStampModelEntry = (Map.Entry) it2.next();
                 AttachedImage attachedImage = new AttachedImage((String) imageModelEntry.getKey(),
-                        ((ContentTimeStamp)timeStampModelEntry.getValue()).getStarttime());
+                        ((TimeStampModel)timeStampModelEntry.getValue()).getStarttime());
                 attachedPictures.put(attachedPictures.size() + "", attachedImage);
             }
 
@@ -444,9 +469,18 @@ public class EditorFrame extends JFrame {
             attachedImage.setVisible(true);
             attachedImage.setToolTipText(Other.getToolTipTextForJButton(attachedImage));
             jPanelAttachedPictures.add(attachedImage);
+            attachedImage.addActionListener(e -> {
+                showEditMenu(attachedImage);
+                //TODO Border color
+                attachedImage.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+            });
         }
         jPanelAttachedPictures.revalidate();
         super.paint(g);
+    }
+
+    private void showEditMenu(AttachedImage attachedImage) {
+        jPanelEdit.setVisible(true);
     }
 
     private void resetUI(){
@@ -469,6 +503,8 @@ public class EditorFrame extends JFrame {
 
         this.mp3Model = new MP3Model();
         this.playerBar.displayNothing();
+
+        jPanelEdit.setVisible(false);
 
         repaint();
     }

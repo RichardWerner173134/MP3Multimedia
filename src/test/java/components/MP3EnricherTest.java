@@ -1,18 +1,16 @@
 package components;
 
-import model.ContentTimeStamp;
+import model.TimeStampModel;
 import model.ImageModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.audio.mp3.MP3FileWriter;
 import org.jaudiotagger.tag.TagException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -92,11 +90,11 @@ class MP3EnricherTest {
 
         HashMap<String, ImageModel> imageModelMap1 = modelWrite.getImageModelMap();
         modelWrite.getImageModelMap().entrySet().stream()
-                .forEach(t -> t.getValue().setTimestampMap(sortByValues(t.getValue().getTimestampMap())));
+                .forEach(t -> t.getValue().setTimeStampModelMap(sortByValues(t.getValue().getTimeStampModelMap())));
 
         HashMap<String, ImageModel> imageModelMap2 = modelRead.getImageModelMap();
         modelRead.getImageModelMap().entrySet().stream()
-                .forEach(t -> t.getValue().setTimestampMap(sortByValues(t.getValue().getTimestampMap())));
+                .forEach(t -> t.getValue().setTimeStampModelMap(sortByValues(t.getValue().getTimeStampModelMap())));
 
         Assert.assertTrue(isImageModelMapEualsTo(imageModelMap1, imageModelMap2));
     }
@@ -114,11 +112,11 @@ class MP3EnricherTest {
             String imageName = (String) entry.getKey();
             ImageModel im1 = (ImageModel) entry.getValue();
 
-            Iterator itTimeStamps = im1.getTimestampMap().entrySet().iterator();
+            Iterator itTimeStamps = im1.getTimeStampModelMap().entrySet().iterator();
             while (itTimeStamps.hasNext()) {
                 Map.Entry entry2 = (Map.Entry) itTimeStamps.next();
 
-                if (!(((ContentTimeStamp) entry2.getValue()).getStarttime() == modelRead.get(imageName).getTimestampMap()
+                if (!(((TimeStampModel) entry2.getValue()).getStarttime() == modelRead.get(imageName).getTimeStampModelMap()
                         .get((String) entry2.getKey()).getStarttime())) {
                     return false;
                 }
@@ -133,8 +131,8 @@ class MP3EnricherTest {
         // Defined Custom Comparator here
         Collections.sort(list, new Comparator() {
             public int compare(Object o1, Object o2) {
-                return ((Comparable) ((ContentTimeStamp) ((Map.Entry) (o1)).getValue()).getStarttime())
-                        .compareTo(((ContentTimeStamp) ((Map.Entry) (o2)).getValue()).getStarttime());
+                return ((Comparable) ((TimeStampModel) ((Map.Entry) (o1)).getValue()).getStarttime())
+                        .compareTo(((TimeStampModel) ((Map.Entry) (o2)).getValue()).getStarttime());
             }
         });
 
