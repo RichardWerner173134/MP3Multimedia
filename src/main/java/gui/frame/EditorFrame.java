@@ -61,15 +61,15 @@ public class EditorFrame extends JFrame {
     private ImageListModel  imageListModel;
     private JPanel          jPanelEdit;
     private JTextField      jTextFieldImageName;
-    private JTextField      jTextFieldStartTimeH;
     private JTextField      jTextFieldStartTimeM;
     private JTextField      jTextFieldStartTimeS;
+    private JTextField      jTextFieldStartTimeMS;
     private JButton         jButtonEdit;
     private JButton         jButtonRemove;
 
-    private AudioPlayer player;
+    private AudioPlayer     player;
     private HashMap<String, AttachedImage> attachedPictures;
-    private int [] currentTimeStamp;
+    private int []          currentTimeStamp;
 
     /**
      * Create the frame.
@@ -194,20 +194,20 @@ public class EditorFrame extends JFrame {
         jPanelEdit.add(jTextFieldImageName);
         jTextFieldImageName.setColumns(10);
 
-        jTextFieldStartTimeH = new JTextField();
-        jTextFieldStartTimeH.setBounds(132, 41, 45, 19);
-        jPanelEdit.add(jTextFieldStartTimeH);
-        jTextFieldStartTimeH.setColumns(10);
-
         jTextFieldStartTimeM = new JTextField();
-        jTextFieldStartTimeM.setColumns(10);
-        jTextFieldStartTimeM.setBounds(187, 41, 45, 19);
+        jTextFieldStartTimeM.setBounds(132, 41, 45, 19);
         jPanelEdit.add(jTextFieldStartTimeM);
+        jTextFieldStartTimeM.setColumns(10);
 
         jTextFieldStartTimeS = new JTextField();
         jTextFieldStartTimeS.setColumns(10);
-        jTextFieldStartTimeS.setBounds(242, 41, 45, 19);
+        jTextFieldStartTimeS.setBounds(187, 41, 45, 19);
         jPanelEdit.add(jTextFieldStartTimeS);
+
+        jTextFieldStartTimeMS = new JTextField();
+        jTextFieldStartTimeMS.setColumns(10);
+        jTextFieldStartTimeMS.setBounds(242, 41, 45, 19);
+        jPanelEdit.add(jTextFieldStartTimeMS);
 
         jButtonEdit = new JButton("Aktualisieren");
         jButtonEdit.setBounds(309, 40, 113, 21);

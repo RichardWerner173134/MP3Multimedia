@@ -74,17 +74,16 @@ public class AudioPlayer{
        double pauseLocationPercentage = ((double)pauseLocation) / ((double)songTotalLength);
        int sStartAll = (int) (pauseLocationPercentage * tracklength);
 
-
        int [] hms = new int[3];
-       int sStart, hStart, mStart;
+       int msStart, mStart, sStart;
 
-       hStart = sStartAll / (60*60);
-       mStart = (sStartAll - hStart * 60 * 60) / 60;
-       sStart = (sStartAll - hStart * 60 * 60 - mStart * 60) % 60;
+       mStart = sStartAll / 60;
+       sStart = (sStartAll - mStart * 60);
+       msStart = 0;
 
-       hms[0] = sStart;
-       hms[1] = mStart;
-       hms[2] = hStart;
+       hms[0] = msStart;
+       hms[1] = sStart;
+       hms[2] = mStart;
        return hms;
    }
 }
