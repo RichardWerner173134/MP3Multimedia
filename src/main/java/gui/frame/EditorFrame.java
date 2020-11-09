@@ -18,11 +18,10 @@ import util.Other;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -31,6 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EditorFrame extends JFrame {
 
@@ -38,8 +38,6 @@ public class EditorFrame extends JFrame {
     private JMenu           jMenuFile;
     private JMenuItem       jMenuResetWorkspace;
     private JMenuItem       jMenuFileItemSave;
-    private JMenuItem       jMenuFileItem2;
-    private JMenu           jMenu2;
     private JPanel          jPanelWest;
     private JButton         jButtonImportImage;
     private JScrollPane     scrollPaneImages;
@@ -64,11 +62,8 @@ public class EditorFrame extends JFrame {
     private JPanel          jPanelEdit;
     private JTextField      jTextFieldImageName;
     private JTextField      jTextFieldStartTimeH;
-    private JTextField      jTextFieldStopTimeH;
     private JTextField      jTextFieldStartTimeM;
     private JTextField      jTextFieldStartTimeS;
-    private JTextField      jTextFieldStopTimeM;
-    private JTextField      jTextFieldStopTimeS;
     private JButton         jButtonEdit;
     private JButton         jButtonRemove;
 
@@ -82,6 +77,7 @@ public class EditorFrame extends JFrame {
     public EditorFrame() {
         setVisible(true);
         setResizable(false);
+        setTitle("MP3-Multimedia Editor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1280, 720);
 
@@ -106,9 +102,6 @@ public class EditorFrame extends JFrame {
 
         jMenuFile.add(jMenuFileItemSave);
 
-        jMenuBar.add(jMenu2);
-
-        jMenu2.add(jMenuFileItem2);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
@@ -182,22 +175,18 @@ public class EditorFrame extends JFrame {
         jPanelEast.add(jPanelAttachedPictures);
 
         jPanelEdit = new JPanel();
-        jPanelEdit.setBounds(48, 290, 404, 112);
+        jPanelEdit.setBounds(48, 290, 485, 82);
         jPanelEast.add(jPanelEdit);
         jPanelEdit.setLayout(null);
         jPanelEdit.setVisible(false);
 
         JLabel jLabelImageName = new JLabel("Bilddatei");
-        jLabelImageName.setBounds(25, 10, 38, 13);
+        jLabelImageName.setBounds(10, 10, 90, 13);
         jPanelEdit.add(jLabelImageName);
 
         JLabel jLabelStarttime = new JLabel("Startzeit");
-        jLabelStarttime.setBounds(25, 44, 45, 13);
+        jLabelStarttime.setBounds(10, 44, 90, 13);
         jPanelEdit.add(jLabelStarttime);
-
-        JLabel jLabelStopTime = new JLabel("Stoppzeit");
-        jLabelStopTime.setBounds(25, 78, 45, 13);
-        jPanelEdit.add(jLabelStopTime);
 
         jTextFieldImageName = new JTextField();
         jTextFieldImageName.setEditable(false);
@@ -210,12 +199,6 @@ public class EditorFrame extends JFrame {
         jPanelEdit.add(jTextFieldStartTimeH);
         jTextFieldStartTimeH.setColumns(10);
 
-        jTextFieldStopTimeH = new JTextField();
-        jTextFieldStopTimeH.setEditable(false);
-        jTextFieldStopTimeH.setBounds(132, 75, 45, 19);
-        jPanelEdit.add(jTextFieldStopTimeH);
-        jTextFieldStopTimeH.setColumns(10);
-
         jTextFieldStartTimeM = new JTextField();
         jTextFieldStartTimeM.setColumns(10);
         jTextFieldStartTimeM.setBounds(187, 41, 45, 19);
@@ -226,24 +209,12 @@ public class EditorFrame extends JFrame {
         jTextFieldStartTimeS.setBounds(242, 41, 45, 19);
         jPanelEdit.add(jTextFieldStartTimeS);
 
-        jTextFieldStopTimeM = new JTextField();
-        jTextFieldStopTimeM.setEditable(false);
-        jTextFieldStopTimeM.setColumns(10);
-        jTextFieldStopTimeM.setBounds(187, 75, 45, 19);
-        jPanelEdit.add(jTextFieldStopTimeM);
-
-        jTextFieldStopTimeS = new JTextField();
-        jTextFieldStopTimeS.setEditable(false);
-        jTextFieldStopTimeS.setColumns(10);
-        jTextFieldStopTimeS.setBounds(242, 75, 45, 19);
-        jPanelEdit.add(jTextFieldStopTimeS);
-
         jButtonEdit = new JButton("Aktualisieren");
-        jButtonEdit.setBounds(309, 74, 85, 21);
+        jButtonEdit.setBounds(309, 40, 113, 21);
         jPanelEdit.add(jButtonEdit);
 
         jButtonRemove = new JButton("Entfernen");
-        jButtonRemove.setBounds(309, 40, 85, 21);
+        jButtonRemove.setBounds(309, 6, 113, 21);
         jPanelEdit.add(jButtonRemove);
 
     }
@@ -335,7 +306,8 @@ public class EditorFrame extends JFrame {
 
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
-                DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures, currentTimeStamp);
+                DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures,
+                        currentTimeStamp, jPanelEdit, jTextFieldImageName, attachedPictures);
                 dialogAttachImage.setEnabled(true);
                 dialogAttachImage.setAlwaysOnTop(true);
                 dialogAttachImage.addWindowListener(new WindowAdapter() {
@@ -421,6 +393,24 @@ public class EditorFrame extends JFrame {
                 Map.Entry timeStampModelEntry = (Map.Entry) it2.next();
                 AttachedImage attachedImage = new AttachedImage((String) imageModelEntry.getKey(),
                         ((TimeStampModel)timeStampModelEntry.getValue()).getStarttime());
+                attachedImage.addActionListener(e -> {
+                    Border blackBorder = new LineBorder(Color.BLACK, 1);
+                    Border redBorder = new LineBorder(Color.RED, 2);
+                    if(attachedImage.isSelected()){
+                        attachedImage.setSelected(false);
+                        attachedImage.setBorder(blackBorder);
+                        jPanelEdit.setVisible(false);
+                    } else{
+                        attachedImage.setSelected(true);
+                        attachedImage.setBorder(redBorder);
+                        jTextFieldImageName.setText(attachedImage.getImageTitle());
+                        jPanelEdit.setVisible(true);
+                    }
+                    for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                        a.setSelected(false);
+                        a.setBorder(blackBorder);
+                    }
+                });
                 attachedPictures.put(attachedPictures.size() + "", attachedImage);
             }
 
@@ -430,7 +420,6 @@ public class EditorFrame extends JFrame {
 
     @Override
     public void paint(Graphics g){
-
         if(attachedPictures.size() == 0){
             jPanelAttachedPictures.revalidate();
             super.paint(g);
@@ -468,19 +457,14 @@ public class EditorFrame extends JFrame {
             attachedImage.setBounds(x1, y1, imgWidth, imgHeight);
             attachedImage.setVisible(true);
             attachedImage.setToolTipText(Other.getToolTipTextForJButton(attachedImage));
+
             jPanelAttachedPictures.add(attachedImage);
-            attachedImage.addActionListener(e -> {
-                showEditMenu(attachedImage);
-                //TODO Border color
-                attachedImage.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-            });
+
         }
+
+
         jPanelAttachedPictures.revalidate();
         super.paint(g);
-    }
-
-    private void showEditMenu(AttachedImage attachedImage) {
-        jPanelEdit.setVisible(true);
     }
 
     private void resetUI(){
@@ -514,11 +498,9 @@ public class EditorFrame extends JFrame {
         jMenuBar = new JMenuBar();
 
         // Menu File
-        jMenuFile = new JMenu("File");
-        jMenuFileItem2 = new JMenuItem("New menu item");
-        jMenuResetWorkspace = new JMenuItem("Reset Workspace");
-        jMenuFileItemSave = new JMenuItem("Save");
-        jMenu2 = new JMenu("New menu");
+        jMenuFile = new JMenu("Datei");
+        jMenuResetWorkspace = new JMenuItem("Arbeitsplatz zurücksetzen");
+        jMenuFileItemSave = new JMenuItem("Speichern");
 
         // Left Component of Frame
         jPanelWest = new JPanel();

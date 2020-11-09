@@ -59,7 +59,6 @@ public class PlayerBar extends JPanel {
     }
 
     public void startMovingCursor(long pauseLocation, long songTotalLength, MP3File mp3File){
-        AtomicInteger pauseLocationAtomic = new AtomicInteger((int) pauseLocation);
 
         drawCursor = true;
         y1 = jProgressBar.getY();

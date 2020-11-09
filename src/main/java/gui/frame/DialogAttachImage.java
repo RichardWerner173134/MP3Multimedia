@@ -4,12 +4,15 @@ import lombok.Getter;
 import model.MP3Model;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Getter
 public class DialogAttachImage extends JDialog {
@@ -26,7 +29,7 @@ public class DialogAttachImage extends JDialog {
      * Create the dialog.
      */
     public DialogAttachImage(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp) {
+                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit, JTextField jTextFieldImageName, HashMap<String, AttachedImage> attachedPictures) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -88,6 +91,29 @@ public class DialogAttachImage extends JDialog {
                         int starttimeMillis = timeInMilliSeconds(starttimeH, starttimeM, starttimeS);
                         String imgId = attachedImages.size() + "";
                         AttachedImage attachedImage = new AttachedImage(selectedValue, starttimeMillis);
+
+                        attachedImage.addActionListener(e2 -> {
+                            Border blackBorder = new LineBorder(Color.BLACK, 1);
+                            Border redBorder = new LineBorder(Color.RED, 2);
+                            if(attachedImage.isSelected()){
+                                attachedImage.setSelected(false);
+                                attachedImage.setBorder(blackBorder);
+                                jPanelEdit.setVisible(false);
+                            } else{
+                                attachedImage.setSelected(true);
+                                attachedImage.setBorder(redBorder);
+                                jTextFieldImageName.setText(attachedImage.getImageTitle());
+                                jPanelEdit.setVisible(true);
+                            }
+                            for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                                a.setSelected(false);
+                                a.setBorder(blackBorder);
+                            }
+                        });
+
+
+
+
                         mp3Model.addImage(selectedValue,
                                 bufferedImage,
                                 starttimeMillis);
