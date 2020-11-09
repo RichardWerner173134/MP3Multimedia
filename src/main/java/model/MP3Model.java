@@ -27,24 +27,24 @@ public class MP3Model {
     public void addImage(String filename, BufferedImage bufferedImage, int starttime){
         if(imageModelMap.containsKey(filename)){
             if(imageModelMap.get(filename) instanceof ImageModel) {
-                boolean containsIdenticalTimestamp = imageModelMap.get(filename).getTimestampMap().values()
+                boolean containsIdenticalTimestamp = imageModelMap.get(filename).getTimeStampModelMap().values()
                         .stream()
                         .map(ts -> ts.getStarttime())
                         .collect(Collectors.toList()).contains(starttime);
                 if(!containsIdenticalTimestamp){
                     imageModelMap.get(filename)
-                            .getTimestampMap()
+                            .getTimeStampModelMap()
                             .put(String.valueOf(starttime),
-                                    new ContentTimeStamp(starttime));
+                                    new TimeStampModel(starttime));
                     imageModelMap.get(filename).setBufferedImage(bufferedImage);
                 }
             }
         } else{
             imageModelMap.put(filename, new ImageModel());
             imageModelMap.get(filename)
-                    .getTimestampMap()
+                    .getTimeStampModelMap()
                     .put(String.valueOf(starttime),
-                            new ContentTimeStamp(starttime));
+                            new TimeStampModel(starttime));
             imageModelMap.get(filename).setBufferedImage(bufferedImage);
         }
 

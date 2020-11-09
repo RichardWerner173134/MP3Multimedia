@@ -1,17 +1,19 @@
 package components;
 
 import lombok.Getter;
-import model.ContentTimeStamp;
+import model.TimeStampModel;
 import model.ImageModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.id3.*;
+import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
+import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
+import org.jaudiotagger.tag.id3.ID3v24Frame;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -94,11 +96,11 @@ public class MP3Enricher {
 
         while(it.hasNext()){
             Map.Entry pair = (Map.Entry)it.next();
-            Iterator it2 = ((ImageModel) pair.getValue()).getTimestampMap().entrySet().iterator();
+            Iterator it2 = ((ImageModel) pair.getValue()).getTimeStampModelMap().entrySet().iterator();
             while(it2.hasNext()){
                 Map.Entry pair2 = (Map.Entry) it2.next();
                 String imageName = String.valueOf(pair.getKey());
-                int timestamp = ((ContentTimeStamp) pair2.getValue()).getStarttime();
+                int timestamp = ((TimeStampModel) pair2.getValue()).getStarttime();
                 entryList.add(new Entry(imageName, timestamp));
             }
         }

@@ -4,21 +4,21 @@ import gui.frame.AttachedImage;
 
 public class Other {
     public static String getToolTipTextForJButton(AttachedImage attachedImage){
-        int sStartAll, hStart, mStart, sStart;
-        int sStopAll, hStop, mStop, sStop;
+        int msStartAll, mStart, sStart, msStart;
+        int msStopAll, mStop, sStop, msStop;
 
-        sStartAll = attachedImage.getStarttimeMillis() / 1000;
-        hStart = sStartAll / (60*60);
-        mStart = (sStartAll - hStart * 60 * 60) / 60;
-        sStart = (sStartAll - hStart * 60 * 60 - mStart * 60) % 60;
+        msStartAll = attachedImage.getStarttimeMillis();
+        mStart = msStartAll / (60*1000);
+        sStart = (msStartAll - mStart * 60 * 1000) / 1000;
+        msStart = (msStartAll - mStart * 60 *1000) % 1000;
 
-        String start = addZeroPadding(hStart + ":" + mStart + ":" + sStart);
+        String start = addZeroPadding(mStart + ":" + sStart + ":" + msStart);
 
-        sStopAll = attachedImage.getStoptime() / 1000;
-        hStop = sStopAll / (60*60);
-        mStop = (sStopAll - hStop * 60 * 60) / 60;
-        sStop = (sStopAll - hStop * 60 * 60 - mStop * 60) % 60;
-        String stop = addZeroPadding(hStop + ":" + mStop + ":" + sStop);
+        msStopAll = attachedImage.getStoptime();
+        mStop = msStopAll / (60*1000);
+        sStop = (msStopAll - mStop * 60 * 1000) / 1000;
+        msStop = (msStopAll - mStop * 60 * 1000) % 1000;
+        String stop = addZeroPadding(mStop + ":" + sStop + ":" + msStop);
 
         return "\"" + attachedImage.getImageTitle()
                 + "\", Startzeit: " + start

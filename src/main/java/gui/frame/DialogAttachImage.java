@@ -4,29 +4,32 @@ import lombok.Getter;
 import model.MP3Model;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Getter
-public class DialogView extends JDialog {
+public class DialogAttachImage extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField jTextFieldImage;
-    private JTextField jTextFieldStartH = new JTextField();
     private JTextField jTextFieldStartM = new JTextField();
     private JTextField jTextFieldStartS = new JTextField();
+    private JTextField jTextFieldStartMS = new JTextField();
     private JLabel jLabelInfo = new JLabel("");
     private JButton okButton;
 
     /**
      * Create the dialog.
      */
-    public DialogView(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                      HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp) {
+    public DialogAttachImage(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
+                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit, JTextField jTextFieldImageName, HashMap<String, AttachedImage> attachedPictures) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -47,28 +50,31 @@ public class DialogView extends JDialog {
         jTextFieldImage.setColumns(10);
 
         JLabel lblNewLabel_1 = new JLabel("Startzeit");
-        lblNewLabel_1.setBounds(12, 89, 81, 44);
+        JLabel lblNewLabel_2 = new JLabel("   min                  sek                 ms");
+        lblNewLabel_1.setBounds(12, 89, 130, 44);
+        lblNewLabel_2.setBounds(155, 125, 400, 44);
         contentPanel.add(lblNewLabel_1);
+        contentPanel.add(lblNewLabel_2);
 
-        jTextFieldStartH.setBounds(155, 89, 52, 44);
-        contentPanel.add(jTextFieldStartH);
-        jTextFieldStartH.setColumns(10);
-
-        jTextFieldStartM.setBounds(230, 89, 52, 44);
+        jTextFieldStartM.setBounds(155, 89, 52, 44);
         contentPanel.add(jTextFieldStartM);
         jTextFieldStartM.setColumns(10);
 
-        jTextFieldStartS.setBounds(302, 89, 52, 44);
+        jTextFieldStartS.setBounds(230, 89, 52, 44);
         contentPanel.add(jTextFieldStartS);
         jTextFieldStartS.setColumns(10);
+
+        jTextFieldStartMS.setBounds(302, 89, 52, 44);
+        contentPanel.add(jTextFieldStartMS);
+        jTextFieldStartMS.setColumns(10);
 
         jLabelInfo.setBounds(12,35,200,44);
         contentPanel.add(jLabelInfo);
 
         if(currentTimeStamp != null){
-            jTextFieldStartS.setText(currentTimeStamp[0] + "");
-            jTextFieldStartM.setText(currentTimeStamp[1] + "");
-            jTextFieldStartH.setText(currentTimeStamp[2] + "");
+            jTextFieldStartMS.setText(currentTimeStamp[0] + "");
+            jTextFieldStartS.setText(currentTimeStamp[1] + "");
+            jTextFieldStartM.setText(currentTimeStamp[2] + "");
         }
 
         {
@@ -82,12 +88,35 @@ public class DialogView extends JDialog {
                 getRootPane().setDefaultButton(okButton);
                 okButton.addActionListener(e -> {
                     try {
-                        int starttimeH = Integer.parseInt(jTextFieldStartH.getText());
                         int starttimeM = Integer.parseInt(jTextFieldStartM.getText());
                         int starttimeS = Integer.parseInt(jTextFieldStartS.getText());
-                        int starttimeMillis = timeInMilliSeconds(starttimeH, starttimeM, starttimeS);
+                        int starttimeMS = Integer.parseInt(jTextFieldStartMS.getText());
+                        int starttimeMillis = timeInMilliSeconds(starttimeM, starttimeS, starttimeMS);
                         String imgId = attachedImages.size() + "";
                         AttachedImage attachedImage = new AttachedImage(selectedValue, starttimeMillis);
+
+                        attachedImage.addActionListener(e2 -> {
+                            Border blackBorder = new LineBorder(Color.BLACK, 1);
+                            Border redBorder = new LineBorder(Color.RED, 2);
+                            if(attachedImage.isSelected()){
+                                attachedImage.setSelected(false);
+                                attachedImage.setBorder(blackBorder);
+                                jPanelEdit.setVisible(false);
+                            } else{
+                                attachedImage.setSelected(true);
+                                attachedImage.setBorder(redBorder);
+                                jTextFieldImageName.setText(attachedImage.getImageTitle());
+                                jPanelEdit.setVisible(true);
+                            }
+                            for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                                a.setSelected(false);
+                                a.setBorder(blackBorder);
+                            }
+                        });
+
+
+
+
                         mp3Model.addImage(selectedValue,
                                 bufferedImage,
                                 starttimeMillis);
@@ -106,9 +135,9 @@ public class DialogView extends JDialog {
                 cancelButton.addActionListener(e -> dispose());
             }
         }
-        jTextFieldStartH.addKeyListener(getNewAdapter(jTextFieldStartH));
         jTextFieldStartM.addKeyListener(getNewAdapter(jTextFieldStartM));
         jTextFieldStartS.addKeyListener(getNewAdapter(jTextFieldStartS));
+        jTextFieldStartMS.addKeyListener(getNewAdapter(jTextFieldStartMS));
     }
 
     private KeyAdapter getNewAdapter(JTextField jTextField){
@@ -145,15 +174,15 @@ public class DialogView extends JDialog {
         return keyAdapter;
     }
 
-    private int timeInMilliSeconds(int hour, int minute, int seconds) {
+    private int timeInMilliSeconds(int minute, int seconds, int milliseconds) {
         int milliSecondsFromZero = 0;
+        milliSecondsFromZero += milliseconds;
         milliSecondsFromZero += seconds * 1000;
         milliSecondsFromZero += minute * 60 * 1000;
-        milliSecondsFromZero += hour * 60 * 60 * 1000;
         return milliSecondsFromZero;
     }
 
     private boolean isEmpty() {
-        return jTextFieldStartH.getText().isEmpty() || jTextFieldStartM.getText().isEmpty() || jTextFieldStartS.getText().isEmpty();
+        return jTextFieldStartM.getText().isEmpty() || jTextFieldStartS.getText().isEmpty() || jTextFieldStartMS.getText().isEmpty();
     }
 }

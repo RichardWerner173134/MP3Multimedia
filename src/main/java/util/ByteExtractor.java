@@ -1,7 +1,7 @@
 package util;
 
 import components.MP3Enricher;
-import model.ContentTimeStamp;
+import model.TimeStampModel;
 import model.ImageModel;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC;
@@ -107,9 +107,9 @@ public class ByteExtractor {
                 model = new ImageModel();
             }
 
-            model.getTimestampMap().put(
+            model.getTimeStampModelMap().put(
                     String.valueOf(entry.getTimestamp()),
-                    new ContentTimeStamp(entry.getTimestamp()));
+                    new TimeStampModel(entry.getTimestamp()));
 
             imageModelMap.put(entry.getKey(), model);
 

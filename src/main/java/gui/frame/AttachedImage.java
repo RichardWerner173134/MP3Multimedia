@@ -15,12 +15,14 @@ public class AttachedImage extends JButton {
     private int starttimeMillis;
     private boolean isNewImage;
     private int stoptime;
+    private boolean isSelected;
 
     public AttachedImage(String imageTitle, int starttimeMillis){
         this.imageTitle = imageTitle;
         this.starttimeMillis = starttimeMillis;
         this.isNewImage = true;
         setText(imageTitle);
+        isSelected = false;
     }
 
     public static int getStopTimeForAttachedImage(String id, HashMap<String, AttachedImage> attachedImages, int tracklength){

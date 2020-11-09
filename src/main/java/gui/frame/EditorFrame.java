@@ -2,7 +2,7 @@ package gui.frame;
 
 import components.AudioPlayer;
 import components.MP3Enricher;
-import model.ContentTimeStamp;
+import model.TimeStampModel;
 import model.ImageListModel;
 import model.ImageModel;
 import model.MP3Model;
@@ -15,9 +15,10 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EditorFrame extends JFrame {
 
@@ -36,8 +38,6 @@ public class EditorFrame extends JFrame {
     private JMenu           jMenuFile;
     private JMenuItem       jMenuResetWorkspace;
     private JMenuItem       jMenuFileItemSave;
-    private JMenuItem       jMenuFileItem2;
-    private JMenu           jMenu2;
     private JPanel          jPanelWest;
     private JButton         jButtonImportImage;
     private JScrollPane     scrollPaneImages;
@@ -59,16 +59,25 @@ public class EditorFrame extends JFrame {
     private JPanel          jPanelAttachedPictures;
     private MP3Model        mp3Model;
     private ImageListModel  imageListModel;
+    private JPanel          jPanelEdit;
+    private JTextField      jTextFieldImageName;
+    private JTextField      jTextFieldStartTimeM;
+    private JTextField      jTextFieldStartTimeS;
+    private JTextField      jTextFieldStartTimeMS;
+    private JButton         jButtonEdit;
+    private JButton         jButtonRemove;
 
-    private AudioPlayer player;
+    private AudioPlayer     player;
     private HashMap<String, AttachedImage> attachedPictures;
-    private int [] currentTimeStamp;
+    private int []          currentTimeStamp;
+
     /**
      * Create the frame.
      */
     public EditorFrame() {
         setVisible(true);
         setResizable(false);
+        setTitle("MP3-Multimedia Editor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1280, 720);
 
@@ -93,9 +102,6 @@ public class EditorFrame extends JFrame {
 
         jMenuFile.add(jMenuFileItemSave);
 
-        jMenuBar.add(jMenu2);
-
-        jMenu2.add(jMenuFileItem2);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
@@ -167,6 +173,50 @@ public class EditorFrame extends JFrame {
         jPanelAttachedPictures.setBounds(playerBar.getX(), playerBar.getY() + 50, playerBar.getWidth(), 50);
         jPanelAttachedPictures.setLayout(null);
         jPanelEast.add(jPanelAttachedPictures);
+
+        jPanelEdit = new JPanel();
+        jPanelEdit.setBounds(48, 290, 485, 82);
+        jPanelEast.add(jPanelEdit);
+        jPanelEdit.setLayout(null);
+        jPanelEdit.setVisible(false);
+
+        JLabel jLabelImageName = new JLabel("Bilddatei");
+        jLabelImageName.setBounds(10, 10, 90, 13);
+        jPanelEdit.add(jLabelImageName);
+
+        JLabel jLabelStarttime = new JLabel("Startzeit");
+        jLabelStarttime.setBounds(10, 44, 90, 13);
+        jPanelEdit.add(jLabelStarttime);
+
+        jTextFieldImageName = new JTextField();
+        jTextFieldImageName.setEditable(false);
+        jTextFieldImageName.setBounds(132, 7, 155, 19);
+        jPanelEdit.add(jTextFieldImageName);
+        jTextFieldImageName.setColumns(10);
+
+        jTextFieldStartTimeM = new JTextField();
+        jTextFieldStartTimeM.setBounds(132, 41, 45, 19);
+        jPanelEdit.add(jTextFieldStartTimeM);
+        jTextFieldStartTimeM.setColumns(10);
+
+        jTextFieldStartTimeS = new JTextField();
+        jTextFieldStartTimeS.setColumns(10);
+        jTextFieldStartTimeS.setBounds(187, 41, 45, 19);
+        jPanelEdit.add(jTextFieldStartTimeS);
+
+        jTextFieldStartTimeMS = new JTextField();
+        jTextFieldStartTimeMS.setColumns(10);
+        jTextFieldStartTimeMS.setBounds(242, 41, 45, 19);
+        jPanelEdit.add(jTextFieldStartTimeMS);
+
+        jButtonEdit = new JButton("Aktualisieren");
+        jButtonEdit.setBounds(309, 40, 113, 21);
+        jPanelEdit.add(jButtonEdit);
+
+        jButtonRemove = new JButton("Entfernen");
+        jButtonRemove.setBounds(309, 6, 113, 21);
+        jPanelEdit.add(jButtonRemove);
+
     }
 
     private void addActionListeners() {
@@ -256,10 +306,11 @@ public class EditorFrame extends JFrame {
 
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
-                DialogView dialogView = new DialogView(selectedValue, mp3Model, bi, attachedPictures, currentTimeStamp);
-                dialogView.setEnabled(true);
-                dialogView.setAlwaysOnTop(true);
-                dialogView.addWindowListener(new WindowAdapter() {
+                DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures,
+                        currentTimeStamp, jPanelEdit, jTextFieldImageName, attachedPictures);
+                dialogAttachImage.setEnabled(true);
+                dialogAttachImage.setAlwaysOnTop(true);
+                dialogAttachImage.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
                         super.windowClosed(e);
@@ -308,6 +359,16 @@ public class EditorFrame extends JFrame {
             }
         });
 
+        // edit AttachedPicture
+        jButtonEdit.addActionListener(e -> {
+            // TODO edit
+        });
+
+        // remove AttachedPicture
+        jButtonRemove.addActionListener(e -> {
+            // TODO remove from MP3Model
+        });
+
         // reset/ Stop player
         jButtonReset.addActionListener(e -> {
             if(player != null){
@@ -327,11 +388,29 @@ public class EditorFrame extends JFrame {
         Iterator it = mp3Model.getImageModelMap().entrySet().iterator();
         while(it.hasNext()){
             Map.Entry imageModelEntry = (Map.Entry) it.next();
-            Iterator it2 = ((ImageModel)imageModelEntry.getValue()).getTimestampMap().entrySet().iterator();
+            Iterator it2 = ((ImageModel)imageModelEntry.getValue()).getTimeStampModelMap().entrySet().iterator();
             while(it2.hasNext()){
                 Map.Entry timeStampModelEntry = (Map.Entry) it2.next();
                 AttachedImage attachedImage = new AttachedImage((String) imageModelEntry.getKey(),
-                        ((ContentTimeStamp)timeStampModelEntry.getValue()).getStarttime());
+                        ((TimeStampModel)timeStampModelEntry.getValue()).getStarttime());
+                attachedImage.addActionListener(e -> {
+                    Border blackBorder = new LineBorder(Color.BLACK, 1);
+                    Border redBorder = new LineBorder(Color.RED, 2);
+                    if(attachedImage.isSelected()){
+                        attachedImage.setSelected(false);
+                        attachedImage.setBorder(blackBorder);
+                        jPanelEdit.setVisible(false);
+                    } else{
+                        attachedImage.setSelected(true);
+                        attachedImage.setBorder(redBorder);
+                        jTextFieldImageName.setText(attachedImage.getImageTitle());
+                        jPanelEdit.setVisible(true);
+                    }
+                    for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                        a.setSelected(false);
+                        a.setBorder(blackBorder);
+                    }
+                });
                 attachedPictures.put(attachedPictures.size() + "", attachedImage);
             }
 
@@ -341,7 +420,6 @@ public class EditorFrame extends JFrame {
 
     @Override
     public void paint(Graphics g){
-
         if(attachedPictures.size() == 0){
             jPanelAttachedPictures.revalidate();
             super.paint(g);
@@ -379,8 +457,12 @@ public class EditorFrame extends JFrame {
             attachedImage.setBounds(x1, y1, imgWidth, imgHeight);
             attachedImage.setVisible(true);
             attachedImage.setToolTipText(Other.getToolTipTextForJButton(attachedImage));
+
             jPanelAttachedPictures.add(attachedImage);
+
         }
+
+
         jPanelAttachedPictures.revalidate();
         super.paint(g);
     }
@@ -406,6 +488,8 @@ public class EditorFrame extends JFrame {
         this.mp3Model = new MP3Model();
         this.playerBar.displayNothing();
 
+        jPanelEdit.setVisible(false);
+
         repaint();
     }
 
@@ -414,11 +498,9 @@ public class EditorFrame extends JFrame {
         jMenuBar = new JMenuBar();
 
         // Menu File
-        jMenuFile = new JMenu("File");
-        jMenuFileItem2 = new JMenuItem("New menu item");
-        jMenuResetWorkspace = new JMenuItem("Reset Workspace");
-        jMenuFileItemSave = new JMenuItem("Save");
-        jMenu2 = new JMenu("New menu");
+        jMenuFile = new JMenu("Datei");
+        jMenuResetWorkspace = new JMenuItem("Arbeitsplatz zurücksetzen");
+        jMenuFileItemSave = new JMenuItem("Speichern");
 
         // Left Component of Frame
         jPanelWest = new JPanel();
