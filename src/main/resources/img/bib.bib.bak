@@ -1,0 +1,26 @@
+% Encoding: UTF-8
+
+@Misc{2020,
+  month     = aug,
+  note      = {Page Version ID: 202719058},
+  title     = {Datenkompression},
+  year      = {2020},
+  abstract  = {Die Datenkompression (wohl lehnübersetzt und eingedeutscht aus dem englischen ‚data compression‘) – auch (weiter eingedeutscht) Datenkomprimierung genannt – ist ein Vorgang, bei dem die Menge digitaler Daten verdichtet oder reduziert wird. Dadurch sinkt der benötigte Speicherplatz und die Übertragungszeit der Daten verkürzt sich. In der Nachrichtentechnik wird die Komprimierung von Nachrichten aus einer Quelle durch einen Sender als Quellenkodierung bezeichnet.Grundsätzlich wird bei der Datenkompression versucht, redundante Informationen zu entfernen. Dazu werden die Daten in eine Darstellung überführt, mit der sich alle – oder zumindest die meisten – Informationen in kürzerer Form darstellen lassen. Diesen Vorgang übernimmt ein Kodierer und man bezeichnet den Vorgang als Kompression oder Komprimierung. Die Umkehrung bezeichnet man als Dekompression oder Dekomprimierung. Man spricht von verlustfreier Kompression, verlustfreier Kodierung oder Redundanzreduktion, wenn aus den komprimierten Daten wieder exakt die Originaldaten gewonnen werden können. Das ist beispielsweise bei der Kompression ausführbarer Programmdateien notwendig. Bei der verlustbehafteten Kompression oder Irrelevanzreduktion können die Originaldaten aus den komprimierten Daten meist nicht mehr exakt zurückgewonnen werden, das heißt, ein Teil der Information geht verloren; die Algorithmen versuchen, möglichst nur „unwichtige“ Informationen wegzulassen. Solche Verfahren werden häufig zur Bild- oder Videokompression und Audiodatenkompression eingesetzt.},
+  copyright = {Creative Commons Attribution-ShareAlike License},
+  file      = {Snapshot:https\://de.wikipedia.org/w/index.php?title=Datenkompression&oldid=202719058:text/html},
+  language  = {de},
+  url       = {https://de.wikipedia.org/w/index.php?title=Datenkompression&oldid=202719058},
+  urldate   = {2020-09-24TZ},
+}
+
+@Misc{fhillebrecht,
+  author   = {fhillebrecht},
+  title    = {Audiocodecs und -formate im Überblick — e-teaching.org},
+  abstract = {Ob Sie eigene Audiodateien im Internet bereitstellen oder bereits vorhandene Ressourcen nutzen möchten – es stehen eine Vielzahl verschiedener Wiedergabeprogramme, Codecs und Dateiformate zur Verfügung. Hier erfahren Sie, worin sich die Dateiformate unterscheiden, welche Qualität je nach Art der Kodierung zu erwarten ist und welche Verfahren für Ihre Anwendungszwecke besonders geeignet sind.},
+  file     = {Snapshot:https\://www.e-teaching.org/technik/aufbereitung/audio/audiocodecs:text/html},
+  language = {de},
+  url      = {https://www.e-teaching.org/technik/aufbereitung/audio/audiocodecs},
+  urldate  = {CURRENT\_TIMESTAMP},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
