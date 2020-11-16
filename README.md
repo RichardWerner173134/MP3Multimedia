@@ -11,7 +11,7 @@ Verwendungszweck:
 Installation
 ---------------
 - Download des RAR-Archivs unter: https://mega.nz/file/OlJFjSBA#snuUlTJuKarI_C3GSdQDE3XJiWxxHdGxWGtYVI6Dadk
-- enthalten sind:
+- enthalten sind (Passwort: "testuser"):
     - mp3multimedia.jar
     - README.md
 - zum Ausführen des Programms ist lediglich die mp3multimedia.jar auszuführen
