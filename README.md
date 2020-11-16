@@ -57,7 +57,7 @@ $\rightarrow Bild \ aus \ Bilderliste \ auswählen \rightarrow Bild \ einbauen \
 	
 Ist der Vorgang erfolgreich, wird das Bild auf der rechten Seite des Editors an der entsprechenden Zeit unter der Wiedergabeleiste angezeigt.
 
-![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIvollohneEdit.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIvollohneEdit.PNG)
 
 * Einbauen eines Bildes zur aktuellen Wiedergabezeit}
 
