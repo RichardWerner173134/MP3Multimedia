@@ -40,7 +40,9 @@ $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \right
 $\rightarrow Bild \ importieren \rightarrow Datei(en) \ im \ Filechooser \ auswählen \rightarrow  \ OK$
 
 ![](./src/main/resources/img/UI/UIBildergeladen.png)
-
+<img src="./src/main/resources/img/UI/UIBildergeladen.png"/>
+<img src="src/main/resources/img/UI/UIBildergeladen.png"/>
+<img src="/src/main/resources/img/UI/UIBildergeladen.png"/>
 * Abspielen, Pausieren und Stoppen einer MP3-Datei
 
     * Ist eine MP3-Datei geladen, ist der Button Start auswählbar. Die Audiodatei kann innerhalb der Anwendung abgespielt werden. Per Klick auf den Button Start wird die Wiedergabe der MP3-Datei gestartet. Der Button Start bekommt ab nun die Funktion Pause. Soll die Wiedergabe auf den Anfang zurückgesetzt werden, muss der Button Stopp betätigt werden.
