@@ -4,7 +4,7 @@ Prototyp zum Erzeugen multimedialer MP3-Präsentationen
 Verwendungszweck:
 ---------------------
 - Dieses Programm dient zum Erstellen multimedialer MP3-Präsentationen. 
-- Es verbindet eine MP3-Audiodatei mit beliebig vielen Bilddateien. Am Ende erhält der User eine herkömmliche MP3-Datei, die ID3v2-Tags enthält.
+- Es verbindet eine MP3-Audiodatei mit beliebig vielen Bilddateien. Am Ende erhält der User eine herkömmliche MP3-Datei, die die ausgewählten Bilder in einem ID3v2-Tag enthält.
 - Die MP3-Datei enthält nach Bearbeitung einen SYLT-Frame und mehrere APIC-Frames.
 - Die Frames enthalten Bilddaten und Zeitstempel. Diese können vom User extrahiert werden und in einem Wiedergabeprogramm als Präsentation dargestellt werden.
 
