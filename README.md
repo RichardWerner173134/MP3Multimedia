@@ -31,7 +31,7 @@ Anleitung
 
 $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \rightarrow OK$
 
-![](./src/main/resources/img/UI/UIMP3geladen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIMP3geladen.PNG)
 
 * Importieren eines Bildes
 
@@ -39,7 +39,7 @@ $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \right
 
 $\rightarrow Bild \ importieren \rightarrow Datei(en) \ im \ Filechooser \ auswählen \rightarrow  \ OK$
 
-![](./src/main/resources/img/UI/UIBildergeladen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIBildergeladen.PNG)
 
 * Abspielen, Pausieren und Stoppen einer MP3-Datei
 
@@ -53,11 +53,11 @@ $\rightarrow Start \rightarrow Pause \rightarrow Start \rightarrow Stop $
 
 $\rightarrow Bild \ aus \ Bilderliste \ auswählen \rightarrow Bild \ einbauen \rightarrow Zeit \ eingeben \rightarrow OK$
 
-![](./src/main/resources/img/UI/UIDialogEinbauen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIDialogEinbauen.png)
 	
 Ist der Vorgang erfolgreich, wird das Bild auf der rechten Seite des Editors an der entsprechenden Zeit unter der Wiedergabeleiste angezeigt.
 
-![](./src/main/resources/img/UI/UIvollohneEdit.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIvollohneEdit.PNG)
 
 * Einbauen eines Bildes zur aktuellen Wiedergabezeit}
 
@@ -71,7 +71,7 @@ $\rightarrow Start \rightarrow Bild \ auswählen \rightarrow Bild \ einbauen \ri
 
 $\rightarrow Bild \ aus \ rechtem Balken \ auswählen \rightarrow Zeit \ korrigieren \rightarrow Aktualisieren$
 
-![](./src/main/resources/img/UI/UIvollmitEdit.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIvollmitEdit.png)
 
 * Löschen eines eingebauten Bildes}
 
@@ -83,7 +83,7 @@ $\rightarrow Bild \ aus \ rechtem \ Balken \ auswählen \rightarrow Entfernen$
 
     * Die MP3-Datei soll nach erfolgreicher Bearbeitung gespeichert werden. Dazu muss im Datei-Menü Speichern ausgewählt werden. Dadurch öffnet sich ein Filechooser. Hier hat der Nutzer zwei verschiedene Möglichkeiten, die Datei zu speichern. Der Nutzer kann die originale MP3-Datei überschreiben oder er kann eine neue MP3-Datei erstellen lassen. Um die originale Datei zu überschreiben, muss der Nutzer diese im Filechooser auswählen und auf Open klicken. Möchte der Nutzer seine Ergebnisse in einer neuen MP3-Datei abspeichern, muss er im Filechooser zum gewünschten Pfad navigieren und einen Dateinamen eingeben. Im Anschluss bestätigt er den Vorgang mit Open. Ist der Vorgang erfolgreich, erhält der Nutzer ein Feedbackfenster und kehrt zum Hauptfenster des Editors zurück. Das Datei-Menü ist in Abbildung \ref{UIMenu} zu sehen.
 
-![](./src/main/resources/img/UI-MenuSkaliert.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI-MenuSkaliert.png)
 
 $\rightarrow Menü: \ Datei \rightarrow Menu-Eintrag: \ Speichern \rightarrow Dateipfad \ und \ Dateinamen \ angeben \rightarrow OK$
 
@@ -119,7 +119,7 @@ Wiedergabe
                 * \<Timestamp\> 4 Bytes -- 0x00000000
                 * Beispiel: 
                 
-![](./src/main/resources/img/SYLT-Framebody-values.png).
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/SYLT-Framebody-values.png).
 
 Bildname        | Synchronisationsbyte  | Timestamp hexadezimal | Timestamp dezimal 
 ----------------|-----------------------|-----------------------|-------------------
