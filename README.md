@@ -39,7 +39,7 @@ $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \right
 
 $\rightarrow Bild \ importieren \rightarrow Datei(en) \ im \ Filechooser \ auswählen \rightarrow  \ OK$
 
-![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIBildergeladen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIBildergeladen.PNG)
 
 * Abspielen, Pausieren und Stoppen einer MP3-Datei
 
