@@ -31,7 +31,7 @@ Anleitung
 
 $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \rightarrow OK$
 
-![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIMP3geladen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI/UIMP3geladen.PNG)
 
 * Importieren eines Bildes
 
