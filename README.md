@@ -40,6 +40,7 @@ $\rightarrow Neue \ MP3 \rightarrow Datei \ im \ Filechooser \ auswählen \right
 $\rightarrow Bild \ importieren \rightarrow Datei(en) \ im \ Filechooser \ auswählen \rightarrow  \ OK$
 
 ![](./src/main/resources/img/UI/UIBildergeladen.png)
+![](https://github.com/RichardWerner173134/MP3Multimedia/blob/master/src/main/resources/img/UI-MenuSkaliert.png)
 <img src="./src/main/resources/img/UI/UIBildergeladen.png"/>
 <img src="src/main/resources/img/UI/UIBildergeladen.png"/>
 <img src="/src/main/resources/img/UI/UIBildergeladen.png"/>
