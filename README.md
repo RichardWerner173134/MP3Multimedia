@@ -1,4 +1,4 @@
-Softwareprojekt - MP3 Präsentation
+Prototyp zum Erzeugen multimedialer MP3-Präsentationen
 ==================================
 
 Verwendungszweck:
