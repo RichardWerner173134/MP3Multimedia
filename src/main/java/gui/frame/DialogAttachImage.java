@@ -2,14 +2,13 @@ package gui.frame;
 
 import lombok.Getter;
 import model.MP3Model;
+import util.Other;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -29,7 +28,7 @@ public class DialogAttachImage extends JDialog {
      * Create the dialog.
      */
     public DialogAttachImage(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit, JTextField jTextFieldImageName, HashMap<String, AttachedImage> attachedPictures) {
+                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit, JTextField jTextFieldImageName) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -91,7 +90,7 @@ public class DialogAttachImage extends JDialog {
                         int starttimeM = Integer.parseInt(jTextFieldStartM.getText());
                         int starttimeS = Integer.parseInt(jTextFieldStartS.getText());
                         int starttimeMS = Integer.parseInt(jTextFieldStartMS.getText());
-                        int starttimeMillis = timeInMilliSeconds(starttimeM, starttimeS, starttimeMS);
+                        int starttimeMillis = Other.timeInMilliSeconds(starttimeM, starttimeS, starttimeMS);
                         String imgId = attachedImages.size() + "";
                         AttachedImage attachedImage = new AttachedImage(selectedValue, starttimeMillis);
 
@@ -108,14 +107,11 @@ public class DialogAttachImage extends JDialog {
                                 jTextFieldImageName.setText(attachedImage.getImageTitle());
                                 jPanelEdit.setVisible(true);
                             }
-                            for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                            for(AttachedImage a : attachedImages.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
                                 a.setSelected(false);
                                 a.setBorder(blackBorder);
                             }
                         });
-
-
-
 
                         mp3Model.addImage(selectedValue,
                                 bufferedImage,
@@ -135,54 +131,8 @@ public class DialogAttachImage extends JDialog {
                 cancelButton.addActionListener(e -> dispose());
             }
         }
-        jTextFieldStartM.addKeyListener(getNewAdapter(jTextFieldStartM));
-        jTextFieldStartS.addKeyListener(getNewAdapter(jTextFieldStartS));
-        jTextFieldStartMS.addKeyListener(getNewAdapter(jTextFieldStartMS));
-    }
-
-    private KeyAdapter getNewAdapter(JTextField jTextField){
-        KeyAdapter keyAdapter = new KeyAdapter(){
-            @Override
-            public void keyReleased(KeyEvent e) {
-                super.keyReleased(e);
-
-                // validate timestamp input
-                String value = jTextField.getText();
-                char[] valueChars = value.toCharArray();
-                boolean isValid = true;
-                for(char c : valueChars){
-                    if(!(c >= '0' && c <= '9')){
-                        isValid = false;
-                        break;
-                    }
-                }
-
-                if (!isValid){
-                    jLabelInfo.setText("Bitte nur Ziffern eingeben [0-9]");
-                    okButton.setEnabled(false);
-                } else{
-                    jLabelInfo.setText("");
-                    if(isEmpty()){
-                        okButton.setEnabled(false);
-                    } else {
-                        okButton.setEnabled(true);
-                    }
-                }
-            }
-
-        };
-        return keyAdapter;
-    }
-
-    private int timeInMilliSeconds(int minute, int seconds, int milliseconds) {
-        int milliSecondsFromZero = 0;
-        milliSecondsFromZero += milliseconds;
-        milliSecondsFromZero += seconds * 1000;
-        milliSecondsFromZero += minute * 60 * 1000;
-        return milliSecondsFromZero;
-    }
-
-    private boolean isEmpty() {
-        return jTextFieldStartM.getText().isEmpty() || jTextFieldStartS.getText().isEmpty() || jTextFieldStartMS.getText().isEmpty();
+        jTextFieldStartM.addKeyListener(Other.getNewAdapter(jTextFieldStartM, jLabelInfo, okButton, jTextFieldStartS, jTextFieldStartMS));
+        jTextFieldStartS.addKeyListener(Other.getNewAdapter(jTextFieldStartS, jLabelInfo, okButton, jTextFieldStartM, jTextFieldStartMS));
+        jTextFieldStartMS.addKeyListener(Other.getNewAdapter(jTextFieldStartMS, jLabelInfo, okButton, jTextFieldStartM, jTextFieldStartS));
     }
 }
