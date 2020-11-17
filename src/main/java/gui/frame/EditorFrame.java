@@ -21,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.basic.BasicBorders;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -65,8 +66,11 @@ public class EditorFrame extends JFrame {
     private JTextField      jTextFieldStartTimeM;
     private JTextField      jTextFieldStartTimeS;
     private JTextField      jTextFieldStartTimeMS;
+    private JLabel          jLabelInfo;
     private JButton         jButtonEdit;
     private JButton         jButtonRemove;
+    private Border          blackBorder;
+    private Border          redBorder;
 
     private AudioPlayer     player;
     private HashMap<String, AttachedImage> attachedPictures;
@@ -210,6 +214,11 @@ public class EditorFrame extends JFrame {
         jTextFieldStartTimeMS.setBounds(242, 41, 45, 19);
         jPanelEdit.add(jTextFieldStartTimeMS);
 
+        jLabelInfo = new JLabel();
+        jLabelInfo.setBounds(132, 60, 300, 20);
+        jLabelInfo.setText("");
+        jPanelEdit.add(jLabelInfo);
+
         jButtonEdit = new JButton("Aktualisieren");
         jButtonEdit.setBounds(309, 40, 113, 21);
         jPanelEdit.add(jButtonEdit);
@@ -308,7 +317,7 @@ public class EditorFrame extends JFrame {
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
                 DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures,
-                        currentTimeStamp, jPanelEdit, jTextFieldImageName, attachedPictures);
+                        currentTimeStamp, jPanelEdit, jTextFieldImageName);
                 dialogAttachImage.setEnabled(true);
                 dialogAttachImage.setAlwaysOnTop(true);
                 dialogAttachImage.addWindowListener(new WindowAdapter() {
@@ -360,15 +369,95 @@ public class EditorFrame extends JFrame {
             }
         });
 
+        // input validation for editPanel
+        jTextFieldStartTimeM.addKeyListener(Other.getNewAdapter(jTextFieldStartTimeM, jLabelInfo, jButtonEdit, jTextFieldStartTimeS, jTextFieldStartTimeMS));
+        jTextFieldStartTimeS.addKeyListener(Other.getNewAdapter(jTextFieldStartTimeS, jLabelInfo, jButtonEdit, jTextFieldStartTimeM, jTextFieldStartTimeMS));
+        jTextFieldStartTimeMS.addKeyListener(Other.getNewAdapter(jTextFieldStartTimeMS, jLabelInfo, jButtonEdit, jTextFieldStartTimeM, jTextFieldStartTimeS));
+
+
         // edit AttachedPicture
         jButtonEdit.addActionListener(e -> {
             // TODO edit
+            int millis = Other.timeInMilliSeconds(
+                    Integer.parseInt(jTextFieldStartTimeM.getText()),
+                    Integer.parseInt(jTextFieldStartTimeS.getText()),
+                    Integer.parseInt(jTextFieldStartTimeMS.getText()));
+
+            String attachedPictureKey = this.attachedPictures.entrySet().stream()
+                    .filter(x->x.getValue().isSelected())
+                    .map(x->x.getValue().getImageTitle())
+                    .findFirst().get();
+
+            BufferedImage bufferedImage = mp3Model.getImageModelMap().get(attachedPictureKey).getBufferedImage();
+            String oldKeyInAttachedPictures = this.attachedPictures.entrySet().stream().filter(f -> f.getValue().isSelected()).findFirst().get().getKey();
+
+            // remove
+            {
+                // remove from imageModelMap
+                ImageModel toBeRemovedTimeStamp = this.mp3Model.getImageModelMap().get(attachedPictureKey);
+                if (toBeRemovedTimeStamp != null) {
+                    int starttimeMillis = attachedPictures.entrySet().stream()
+                            .map(Map.Entry::getValue)
+                            .filter(AttachedImage::isSelected)
+                            .findFirst()
+                            .get()
+                            .getStarttimeMillis();
+                    toBeRemovedTimeStamp.getTimeStampModelMap().remove(String.valueOf(starttimeMillis));
+                }
+
+                // remove Button
+                this.jPanelAttachedPictures.remove(
+                        Arrays.asList(this.jPanelAttachedPictures.getComponents())
+                                .stream()
+                                .filter(s -> ((AttachedImage) s).isSelected())
+                                .findFirst()
+                                .get());
+
+                // remove from List
+
+                this.attachedPictures.remove(oldKeyInAttachedPictures);
+            }
+
+            // add new
+            {
+                AttachedImage attachedImage = new AttachedImage(attachedPictureKey, millis);
+
+                attachedImage.addActionListener(e2 -> {
+                    if(attachedImage.isSelected()){
+                        attachedImage.setSelected(false);
+                        attachedImage.setBorder(blackBorder);
+                        jPanelEdit.setVisible(false);
+                    } else{
+                        attachedImage.setSelected(true);
+                        attachedImage.setBorder(redBorder);
+                        jTextFieldImageName.setText(attachedImage.getImageTitle());
+                        jPanelEdit.setVisible(true);
+                    }
+                    for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
+                        a.setSelected(false);
+                        a.setBorder(blackBorder);
+                    }
+                });
+
+                mp3Model.addImage(attachedPictureKey,
+                        bufferedImage,
+                        millis);
+
+                attachedPictures.put(oldKeyInAttachedPictures, attachedImage);
+                attachedImage.setBorder(redBorder);
+                jTextFieldStartTimeM.setText(Other.getMinutesForMillis(attachedImage.getStarttimeMillis()));
+                jTextFieldStartTimeS.setText(Other.getSecondsForMillis(attachedImage.getStarttimeMillis()));
+                jTextFieldStartTimeMS.setText(Other.getMilliSecondsForMillis(attachedImage.getStarttimeMillis()));
+
+                // stays selected
+                attachedImage.setSelected(true);
+            }
+
+            repaint();
         });
 
         // remove AttachedPicture
         jButtonRemove.addActionListener(e -> {
-            // TODO remove from MP3Model
-
             String attachedPictureKey = this.attachedPictures.entrySet().stream()
                     .filter(x->x.getValue().isSelected())
                     .map(x->x.getValue().getImageTitle())
@@ -435,8 +524,6 @@ public class EditorFrame extends JFrame {
                 AttachedImage attachedImage = new AttachedImage((String) imageModelEntry.getKey(),
                         ((TimeStampModel)timeStampModelEntry.getValue()).getStarttime());
                 attachedImage.addActionListener(e -> {
-                    Border blackBorder = new LineBorder(Color.BLACK, 1);
-                    Border redBorder = new LineBorder(Color.RED, 2);
                     if(attachedImage.isSelected()){
                         attachedImage.setSelected(false);
                         attachedImage.setBorder(blackBorder);
@@ -579,5 +666,9 @@ public class EditorFrame extends JFrame {
         jPanelAttachedPictures = new JPanel();
         // displaying Frames, for testing purposes
         jLabelFrames = new JLabel("");
+
+        // Borders
+        blackBorder = new LineBorder(Color.BLACK, 1);
+        redBorder = new LineBorder(Color.RED, 2);
     }
 }
