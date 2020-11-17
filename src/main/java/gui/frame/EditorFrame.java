@@ -66,6 +66,7 @@ public class EditorFrame extends JFrame {
     private JTextField      jTextFieldStartTimeM;
     private JTextField      jTextFieldStartTimeS;
     private JTextField      jTextFieldStartTimeMS;
+    private JLabel          jLabelUnit;
     private JLabel          jLabelInfo;
     private JButton         jButtonEdit;
     private JButton         jButtonRemove;
@@ -226,6 +227,10 @@ public class EditorFrame extends JFrame {
         jButtonRemove = new JButton("Entfernen");
         jButtonRemove.setBounds(309, 6, 113, 21);
         jPanelEdit.add(jButtonRemove);
+
+        jLabelUnit = new JLabel("min            sek            ms");
+        jLabelUnit.setBounds(138,60,150,20);
+        jPanelEdit.add(jLabelUnit);
 
     }
 

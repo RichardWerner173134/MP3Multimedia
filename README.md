@@ -101,7 +101,7 @@ Wiedergabe
     * zum Speichern der Informationen werden mehrere APIC-Frames und ein SYLT-Frame verwendet
     * die APIC-Frames enthalten die Bilddaten
         * Textencoding: UTF-8
-        * MIME-Type: img/png 
+        * MIME-Type: image/png, image/jpeg
         * Picture-Type: Other
         * Description: \<Name der Bilddatei.Endung\>
         * Data: Bilddaten
