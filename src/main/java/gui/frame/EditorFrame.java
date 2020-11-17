@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -367,6 +368,46 @@ public class EditorFrame extends JFrame {
         // remove AttachedPicture
         jButtonRemove.addActionListener(e -> {
             // TODO remove from MP3Model
+
+            String attachedPictureKey = this.attachedPictures.entrySet().stream()
+                    .filter(x->x.getValue().isSelected())
+                    .map(x->x.getValue().getImageTitle())
+                    .findFirst().get();
+
+            // remove from imageModelMap
+            ImageModel toBeRemovedTimeStamp = this.mp3Model.getImageModelMap().get(attachedPictureKey);
+            if(toBeRemovedTimeStamp != null){
+                int starttimeMillis = attachedPictures.entrySet().stream()
+                        .map(Map.Entry::getValue)
+                        .filter(AttachedImage::isSelected)
+                        .findFirst()
+                        .get()
+                        .getStarttimeMillis();
+                toBeRemovedTimeStamp.getTimeStampModelMap().remove(String.valueOf(starttimeMillis));
+                if(toBeRemovedTimeStamp.getTimeStampModelMap().size() == 0){
+                    this.mp3Model.getImageModelMap().remove(attachedPictureKey);
+                }
+            }
+
+            // remove Button
+            this.jPanelAttachedPictures.remove(
+                    Arrays.asList(this.jPanelAttachedPictures.getComponents())
+                            .stream()
+                            .filter(s->((AttachedImage)s).isSelected())
+                            .findFirst()
+                            .get());
+
+            // remove from List
+
+            this.attachedPictures.remove(this.attachedPictures.entrySet().stream().filter(f->f.getValue().isSelected()).findFirst().get().getKey());
+
+            this.jTextFieldImageName.setText("");
+            this.jTextFieldStartTimeM.setText("");
+            this.jTextFieldStartTimeS.setText("");
+            this.jTextFieldStartTimeMS.setText("");
+            this.jPanelEdit.setVisible(false);
+
+            repaint();
         });
 
         // reset/ Stop player
