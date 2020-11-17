@@ -446,6 +446,11 @@ public class EditorFrame extends JFrame {
                         attachedImage.setBorder(redBorder);
                         jTextFieldImageName.setText(attachedImage.getImageTitle());
                         jPanelEdit.setVisible(true);
+
+                        String formattedTimeForAttachedImage = Other.getFormattedTimeForAttachedImage(attachedImage);
+                        jTextFieldStartTimeM.setText(Other.getMinutesForMillis(attachedImage.getStarttimeMillis()));
+                        jTextFieldStartTimeS.setText(Other.getSecondsForMillis(attachedImage.getStarttimeMillis()));
+                        jTextFieldStartTimeMS.setText(Other.getMilliSecondsForMillis(attachedImage.getStarttimeMillis()));
                     }
                     for(AttachedImage a : attachedPictures.values().stream().filter(ai -> ai != attachedImage).collect(Collectors.toList())){
                         a.setSelected(false);
@@ -497,7 +502,7 @@ public class EditorFrame extends JFrame {
             attachedImage.setBackground(Color.yellow);
             attachedImage.setBounds(x1, y1, imgWidth, imgHeight);
             attachedImage.setVisible(true);
-            attachedImage.setToolTipText(Other.getToolTipTextForJButton(attachedImage));
+            attachedImage.setToolTipText(Other.getFormattedTimeForAttachedImage(attachedImage));
 
             jPanelAttachedPictures.add(attachedImage);
 

@@ -3,7 +3,26 @@ package util;
 import gui.frame.AttachedImage;
 
 public class Other {
-    public static String getToolTipTextForJButton(AttachedImage attachedImage){
+
+    public static String getMinutesForMillis(int msStartAll){
+        int mStart = msStartAll / (60*1000);
+        return String.valueOf(mStart);
+    }
+
+    public static String getSecondsForMillis(int msStartAll){
+        int mStart = msStartAll / (60*1000);
+        int sStart = (msStartAll - mStart * 60 * 1000) / 1000;
+        return String.valueOf(sStart);
+    }
+
+    public static String getMilliSecondsForMillis(int msStartAll){
+        int mStart = msStartAll / (60*1000);
+        int sStart = (msStartAll - mStart * 60 * 1000) / 1000;
+        int msStart = (msStartAll - mStart * 60 *1000) % 1000;
+        return String.valueOf(msStart);
+    }
+
+    public static String getFormattedTimeForAttachedImage(AttachedImage attachedImage){
         int msStartAll, mStart, sStart, msStart;
         int msStopAll, mStop, sStop, msStop;
 
