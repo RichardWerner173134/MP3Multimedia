@@ -34,13 +34,13 @@ public class PlayerBar extends JPanel {
         jProgressBar.setVisible(true);
         hasMP3 = false;
         y1 = jProgressBar.getY();
-        // y2 = jProgressBar.getY() + jProgressBar.getHeight();
         y2 = jProgressBar.getY() + 32;
     }
 
-    public void displayMP3(){
+    public void displayMP3(int tracklengthSec){
         jProgressBar.setBackground(Color.YELLOW);
         hasMP3 = true;
+        this.tracklengthSec = tracklengthSec;
     }
 
     public void displayNothing(){

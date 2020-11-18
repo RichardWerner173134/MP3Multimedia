@@ -253,7 +253,7 @@ public class EditorFrame extends JFrame {
                 }
                 mp3Model.setMp3FileAndLoad(mp3File);
                 jLabelMP3Name.setText(mp3File.getFile().getAbsolutePath());
-                playerBar.displayMP3();
+                playerBar.displayMP3(mp3File.getMP3AudioHeader().getTrackLength());
 
                 initExistingAttachedPictures();
 
