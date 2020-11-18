@@ -3,6 +3,7 @@ package gui.frame;
 import lombok.Getter;
 import lombok.Setter;
 import org.jaudiotagger.audio.mp3.MP3File;
+import util.Other;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +16,7 @@ public class PlayerBar extends JPanel {
     private int currentPosSec;
     private int x1, x2, y1, y2;
     private boolean drawCursor;
+    private boolean hasMP3;
 
     private JProgressBar jProgressBar;
     private int length;
@@ -30,14 +32,20 @@ public class PlayerBar extends JPanel {
         jProgressBar.setEnabled(true);
         jProgressBar.setValue(0);
         jProgressBar.setVisible(true);
+        hasMP3 = false;
+        y1 = jProgressBar.getY();
+        // y2 = jProgressBar.getY() + jProgressBar.getHeight();
+        y2 = jProgressBar.getY() + 32;
     }
 
     public void displayMP3(){
         jProgressBar.setBackground(Color.YELLOW);
+        hasMP3 = true;
     }
 
     public void displayNothing(){
         jProgressBar.setBackground(null);
+        hasMP3 = false;
     }
 
     @Override
@@ -49,39 +57,38 @@ public class PlayerBar extends JPanel {
     @Override
     public void paint(Graphics g){
         super.paint(g);
-        if(drawCursor){
-            System.out.println("Painting: \nx1=" + x1 + "\ny1=" + y1 + "\nx2=" + x2 + "\ny2=" + y2);
+        // drawing cursor if playing
+        if(drawCursor || hasMP3){
             Graphics2D g2 = (Graphics2D) g;
             g2.setStroke(new BasicStroke(10));
+            System.out.println("Painting: \nx1=" + x1 + "\ny1=" + y1 + "\nx2=" + x2 + "\ny2=" + y2);
             g.drawLine(x1, y1, x2, y2);
-            g.drawString(currentPosSec + "/" + tracklengthSec, getWidth() / 2, getHeight() / 2);
+            g.drawString(Other.getMinutesForMillis(currentPosSec*1000) + ":"
+                    + Other.getSecondsForMillis(currentPosSec*1000) + ":"
+                    + "/" + Other.getMinutesForMillis(tracklengthSec*1000) + ":"
+                    + Other.getSecondsForMillis(tracklengthSec*1000), getWidth() / 2, getHeight() / 2);
         }
     }
 
     public void startMovingCursor(long pauseLocation, long songTotalLength, MP3File mp3File){
-
         drawCursor = true;
-        y1 = jProgressBar.getY();
-        y2 = jProgressBar.getY() + jProgressBar.getHeight();
-
         double percentage = ((double)pauseLocation) / ((double)(songTotalLength));
 
         tracklengthSec = mp3File.getAudioHeader().getTrackLength();
         currentPosSec = (int)(((double)tracklengthSec) * percentage);
 
         cursorThread = new Thread(() -> {
-            while((currentPosSec <= tracklengthSec) && (drawCursor) && (!Thread.currentThread().isInterrupted())){
-                try {
+            try{
+                while((currentPosSec <= tracklengthSec) && (drawCursor) && (!Thread.currentThread().isInterrupted())){
+                    double newPercentage = ((double)currentPosSec) / ((double)tracklengthSec);
+                    x1 = (int)(jProgressBar.getWidth() * newPercentage);
+                    x2 = x1;
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    currentPosSec += 1;
+                    repaint();
                 }
-
-                double newPercentage = ((double)currentPosSec) / ((double)tracklengthSec);
-                x1 = (int)(jProgressBar.getWidth() * newPercentage);
-                x2 = x1;
-                repaint();
-                currentPosSec += 1;
+            } catch(InterruptedException e){
+                Thread.currentThread().interrupt();
             }
             drawCursor = false;
             System.out.println("FERTIG");
@@ -90,9 +97,15 @@ public class PlayerBar extends JPanel {
         cursorThread.start();
     }
 
-    public void stopDrawing(){
-        drawCursor = false;
+    public void stopDrawing(long pauseLocation, long songTotalLength){
         cursorThread.interrupt();
+
+        double percentage = ((double)pauseLocation) / ((double)(songTotalLength));
+        currentPosSec = (int)(((double)tracklengthSec) * percentage);
+        x1 = currentPosSec;
+        x2 = x1;
+        drawCursor = false;
+        repaint();
     }
 
 }

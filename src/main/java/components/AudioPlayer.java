@@ -37,7 +37,7 @@ public class AudioPlayer{
            try {
                pauseLocation = songTotalLength - fis.available();
                player.close();
-               playerBar.stopDrawing();
+               playerBar.stopDrawing(pauseLocation, songTotalLength);
            } catch (IOException e) {
                e.printStackTrace();
            }
@@ -47,7 +47,7 @@ public class AudioPlayer{
    public void stop(PlayerBar playerBar){
        player.close();
        pauseLocation = 0;
-       playerBar.stopDrawing();
+       playerBar.stopDrawing(pauseLocation, songTotalLength);
    }
 
    public void resume(PlayerBar playerBar, MP3File mp3file){
