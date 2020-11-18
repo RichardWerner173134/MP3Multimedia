@@ -15,6 +15,7 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicBorders;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -66,6 +69,7 @@ public class EditorFrame extends JFrame {
     private JTextField      jTextFieldStartTimeM;
     private JTextField      jTextFieldStartTimeS;
     private JTextField      jTextFieldStartTimeMS;
+    private JButton         jButtonShowImg;
     private JLabel          jLabelUnit;
     private JLabel          jLabelInfo;
     private JButton         jButtonEdit;
@@ -150,7 +154,7 @@ public class EditorFrame extends JFrame {
         contentPane.add(jPanelEast);
         jPanelEast.setLayout(null);
 
-        jLabelMP3Name.setBounds(48, 90, 148, 19);
+        jLabelMP3Name.setBounds(48, 90, 400, 19);
         jLabelMP3Name.setForeground(Color.GRAY);
         jLabelMP3Name.setBackground(Color.BLACK);
         jPanelEast.add(jLabelMP3Name);
@@ -181,7 +185,7 @@ public class EditorFrame extends JFrame {
         jPanelEast.add(jPanelAttachedPictures);
 
         jPanelEdit = new JPanel();
-        jPanelEdit.setBounds(48, 290, 485, 82);
+        jPanelEdit.setBounds(48, 290, 485, 100);
         jPanelEast.add(jPanelEdit);
         jPanelEdit.setLayout(null);
         jPanelEdit.setVisible(false);
@@ -214,6 +218,10 @@ public class EditorFrame extends JFrame {
         jTextFieldStartTimeMS.setColumns(10);
         jTextFieldStartTimeMS.setBounds(242, 41, 45, 19);
         jPanelEdit.add(jTextFieldStartTimeMS);
+
+        jButtonShowImg = new JButton("Bild anzeigen");
+        jButtonShowImg.setBounds(309, 74, 113, 21);
+        jPanelEdit.add(jButtonShowImg);
 
         jLabelInfo = new JLabel();
         jLabelInfo.setBounds(132, 60, 300, 20);
@@ -295,6 +303,7 @@ public class EditorFrame extends JFrame {
                 if(mp3Model.getMp3File() != null){
                     jButtonAttachPicture.setEnabled(true);
                 }
+                jButtonShowPicture.setEnabled(true);
             }
             else{
                 ImageIcon imageIcon = new ImageIcon(
@@ -322,7 +331,7 @@ public class EditorFrame extends JFrame {
             if(selectedValue != null) {
                 BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
                 DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures,
-                        currentTimeStamp, jPanelEdit, jTextFieldImageName);
+                        currentTimeStamp, jPanelEdit, jTextFieldImageName, jTextFieldStartTimeM, jTextFieldStartTimeS, jTextFieldStartTimeMS);
                 dialogAttachImage.setEnabled(true);
                 dialogAttachImage.setAlwaysOnTop(true);
                 dialogAttachImage.addWindowListener(new WindowAdapter() {
@@ -382,7 +391,6 @@ public class EditorFrame extends JFrame {
 
         // edit AttachedPicture
         jButtonEdit.addActionListener(e -> {
-            // TODO edit
             int millis = Other.timeInMilliSeconds(
                     Integer.parseInt(jTextFieldStartTimeM.getText()),
                     Integer.parseInt(jTextFieldStartTimeS.getText()),
@@ -517,6 +525,24 @@ public class EditorFrame extends JFrame {
         jMenuResetWorkspace.addActionListener(e -> {
             resetUI();
         });
+
+        // Picture Preview
+        jButtonShowPicture.addActionListener(e -> {
+            String selectedValue = (String) ((JList) imageList).getSelectedValue();
+            BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
+            Other.imagePreview(bi);
+        });
+
+        // Picture Preview Edit Panel
+        jButtonShowImg.addActionListener(e -> {
+            String imgTitle = attachedPictures.entrySet().stream()
+                    .filter(x->x.getValue().isSelected())
+                    .map(x->x.getValue().getImageTitle())
+                    .findFirst()
+                    .get();
+            BufferedImage bi = mp3Model.getImageModelMap().get(imgTitle).getBufferedImage();
+            Other.imagePreview(bi);
+        });
     }
 
     private void initExistingAttachedPictures() {
@@ -608,6 +634,7 @@ public class EditorFrame extends JFrame {
     private void resetUI(){
         this.imageListModel.removeAllElements();
 
+        this.player.stop(playerBar);
         this.player = null;
         this.jButtonPlayPause.setEnabled(false);
         this.jButtonPlayPause.setText("Start");

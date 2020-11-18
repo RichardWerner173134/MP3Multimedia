@@ -2,9 +2,14 @@ package util;
 
 import gui.frame.AttachedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Other {
 
@@ -109,5 +114,27 @@ public class Other {
 
     private static boolean isEmpty(JTextField jTextFieldStart1, JTextField jTextFieldStart2, JTextField jTextFieldStartM3) {
         return jTextFieldStart1.getText().isEmpty() || jTextFieldStart2.getText().isEmpty() || jTextFieldStartM3.getText().isEmpty();
+    }
+
+    public static void imagePreview(BufferedImage bi){
+        File f = null;
+        try {
+            f = File.createTempFile("temp", ".png");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            ImageIO.write(bi, "png", f);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        Desktop dt = Desktop.getDesktop();
+        try {
+            dt.open(f);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        f.deleteOnExit();
+        System.out.println("Done.");
     }
 }

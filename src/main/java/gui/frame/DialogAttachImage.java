@@ -28,7 +28,9 @@ public class DialogAttachImage extends JDialog {
      * Create the dialog.
      */
     public DialogAttachImage(String selectedValue, MP3Model mp3Model, BufferedImage bufferedImage,
-                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit, JTextField jTextFieldImageName) {
+                             HashMap<String, AttachedImage> attachedImages, int[] currentTimeStamp, JPanel jPanelEdit,
+                             JTextField jTextFieldImageName,
+                             JTextField jTextFieldStartPassedM, JTextField jTextFieldStartPassedS, JTextField jTextFieldStartPassedMS) {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
         setBounds(100, 100, 453, 236);
@@ -111,7 +113,11 @@ public class DialogAttachImage extends JDialog {
                                 a.setSelected(false);
                                 a.setBorder(blackBorder);
                             }
+                            jTextFieldStartPassedM.setText(Other.getMinutesForMillis(attachedImage.getStarttimeMillis()));
+                            jTextFieldStartPassedS.setText(Other.getSecondsForMillis(attachedImage.getStarttimeMillis()));
+                            jTextFieldStartPassedMS.setText(Other.getMilliSecondsForMillis(attachedImage.getStarttimeMillis()));
                         });
+
 
                         mp3Model.addImage(selectedValue,
                                 bufferedImage,
