@@ -10,7 +10,7 @@ Verwendungszweck:
 
 Installation
 ---------------
-- Download des RAR-Archivs unter: https://mega.nz/file/OlJFjSBA#snuUlTJuKarI_C3GSdQDE3XJiWxxHdGxWGtYVI6Dadk
+- Download des RAR-Archivs unter: https://mega.nz/file/Skh2iCrZ#BxpIK67Q4YxG1BOv-kNS6aEkJqfEVvVXbaGQsrS-Zi0
 - enthalten sind (Passwort: "testuser"):
     - mp3multimedia.jar
     - README.md
