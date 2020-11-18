@@ -40,15 +40,19 @@ public class MP3Enricher {
         frame = new ID3v24Frame("SYLT");
         byte[] data = buff.array();
         FrameBodySYLT framebody = new FrameBodySYLT(0, "eng", 2,
-                8, "rwernerMultimediaApp", data);
+                8, "", data);
         frame.setBody(framebody);
         tag.frameMap.put("SYLT", frame);
     }
 
-    private static byte[] getImageBytes(BufferedImage bufferedImage) {
+    private static byte[] getImageBytes(BufferedImage bufferedImage, String fileName) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String formatName = Optional.ofNullable(fileName)
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(fileName.lastIndexOf(".") + 1))
+                .get();
         try {
-            ImageIO.write(bufferedImage, "png", baos);
+            ImageIO.write(bufferedImage, formatName, baos);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -213,7 +217,7 @@ public class MP3Enricher {
     }
 
     private static void attachImage(BufferedImage bi, String filename, MP3File mp3File) {
-        ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi), filename);
+        ID3v24Frame apicFrame = createAPICFrame(getImageBytes(bi, filename), filename);
         addAPICFrame(mp3File, apicFrame);
     }
 
