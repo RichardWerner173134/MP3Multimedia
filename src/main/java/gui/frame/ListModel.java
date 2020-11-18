@@ -1,4 +1,4 @@
-package model;
+package gui.frame;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,11 +12,11 @@ import java.util.HashMap;
 
 @Getter
 @Setter
-public class ImageListModel extends DefaultListModel{
+public class ListModel extends DefaultListModel{
 
     private HashMap<String, BufferedImage> imageMap;
 
-    public ImageListModel() {
+    public ListModel() {
         imageMap = new HashMap<>();
     }
 

@@ -1,4 +1,4 @@
-package util;
+package components;
 
 import components.MP3Enricher;
 import model.TimeStampModel;

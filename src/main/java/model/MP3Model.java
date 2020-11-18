@@ -7,7 +7,7 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
-import util.ByteExtractor;
+import components.ByteExtractor;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

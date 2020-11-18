@@ -3,7 +3,6 @@ package gui.frame;
 import components.AudioPlayer;
 import components.MP3Enricher;
 import model.TimeStampModel;
-import model.ImageListModel;
 import model.ImageModel;
 import model.MP3Model;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -15,17 +14,13 @@ import org.jaudiotagger.tag.TagException;
 import util.IOUtil;
 import util.Other;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.basic.BasicBorders;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -39,6 +34,7 @@ import java.util.stream.Collectors;
 
 public class EditorFrame extends JFrame {
 
+    // Menu
     private JMenuBar        jMenuBar;
     private JMenu           jMenuFile;
     private JMenuItem       jMenuResetWorkspace;
@@ -63,7 +59,7 @@ public class EditorFrame extends JFrame {
     private JPanel          contentPane;
     private JPanel          jPanelAttachedPictures;
     private MP3Model        mp3Model;
-    private ImageListModel  imageListModel;
+    private ListModel       listModel;
     private JPanel          jPanelEdit;
     private JTextField      jTextFieldImageName;
     private JTextField      jTextFieldStartTimeM;
@@ -92,7 +88,7 @@ public class EditorFrame extends JFrame {
         setBounds(100, 100, 1280, 720);
 
         mp3Model = new MP3Model();
-        imageListModel = new ImageListModel();
+        listModel = new ListModel();
         attachedPictures = new HashMap<>();
         currentTimeStamp = new int[3];
 
@@ -285,9 +281,9 @@ public class EditorFrame extends JFrame {
             if(returnVal == JFileChooser.APPROVE_OPTION){
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 for(File f : selectedFiles){
-                    imageListModel.addImage(f);
+                    listModel.addImage(f);
                 }
-                imageList.setModel(imageListModel);
+                imageList.setModel(listModel);
             }
         });
 
@@ -295,7 +291,7 @@ public class EditorFrame extends JFrame {
         imageList.addListSelectionListener(e -> {
             String selectedValue = (String)((JList) e.getSource()).getSelectedValue();
             if(selectedValue != null) {
-                BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
+                BufferedImage bi = listModel.getImageMap().get(selectedValue);
                 ImageIcon icon = new ImageIcon(bi.getScaledInstance(jLabelImagePreview.getWidth(), jLabelImagePreview.getHeight(),
                         Image.SCALE_SMOOTH));
                 jLabelImagePreview.setIcon(icon);
@@ -329,7 +325,7 @@ public class EditorFrame extends JFrame {
             }
 
             if(selectedValue != null) {
-                BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
+                BufferedImage bi = listModel.getImageMap().get(selectedValue);
                 DialogAttachImage dialogAttachImage = new DialogAttachImage(selectedValue, mp3Model, bi, attachedPictures,
                         currentTimeStamp, jPanelEdit, jTextFieldImageName, jTextFieldStartTimeM, jTextFieldStartTimeS, jTextFieldStartTimeMS);
                 dialogAttachImage.setEnabled(true);
@@ -529,7 +525,7 @@ public class EditorFrame extends JFrame {
         // Picture Preview
         jButtonShowPicture.addActionListener(e -> {
             String selectedValue = (String) ((JList) imageList).getSelectedValue();
-            BufferedImage bi = imageListModel.getImageMap().get(selectedValue);
+            BufferedImage bi = listModel.getImageMap().get(selectedValue);
             Other.imagePreview(bi);
         });
 
@@ -632,7 +628,7 @@ public class EditorFrame extends JFrame {
     }
 
     private void resetUI(){
-        this.imageListModel.removeAllElements();
+        this.listModel.removeAllElements();
 
         this.player.stop(playerBar);
         this.player = null;
